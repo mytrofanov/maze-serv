@@ -17,7 +17,7 @@ export class GameGateway implements OnGatewayConnection {
 
   @SubscribeMessage('createGame')
   async handleCreateGame(client: any, payload: any): Promise<any> {
-    const newGame = await this.gameService.create(); // Ваш метод для створення нової гри
+    const newGame = await this.gameService.createGame(payload); // Ваш метод для створення нової гри
     client.emit('gameCreated', newGame);
   }
 }

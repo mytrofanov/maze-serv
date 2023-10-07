@@ -13,7 +13,8 @@ export class GameService {
         private readonly mazeModel: typeof Maze,
     ) {}
 
-    async createGame(player1Id: number): Promise<Game> {
+    async createGame(payload: any): Promise<Game> {
+        const {player1Id} = payload;
         const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
         if (!randomMazeData) {
             throw new NotFoundException('Maze not found');
