@@ -10,10 +10,17 @@ export class GameGateway implements OnGatewayConnection {
 
   constructor(private readonly gameService: GameService) {}
 
-  handleConnection(client: any) {
-    //console.log('Client connected:', client.id);
+  async handleConnection(client: any) {
     console.log('Client connected:', client);
+
+    const availableGames = await this.gameService.getAvailableGames();
+    if (availableGames && availableGames.length) {
+      client.emit('availableGames', availableGames);
+    } else {
+      client.emit('availableGames', []);
+    }
   }
+
 
   @SubscribeMessage('createGame')
   async handleCreateGame(client: any, payload: any): Promise<any> {
