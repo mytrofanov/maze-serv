@@ -23,8 +23,8 @@ export class Game extends Model {
     player1: Player;
 
     @ForeignKey(() => Player)
-    @Column({ type: DataType.INTEGER, allowNull: false })
-    player2Id: number;
+    @Column({ type: DataType.INTEGER, allowNull: true })
+    player2Id?: number;
 
     @BelongsTo(() => Player)
     player2: Player;

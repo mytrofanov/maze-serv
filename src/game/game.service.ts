@@ -2,8 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Game } from './game.model';
 import { Maze } from '../maze/maze.model';
-import { Player } from '../players/player.model';
-import { GameLog } from '../game-log/game-log.model';
 import {Mazes} from "../lib/mazes";
 
 @Injectable()
