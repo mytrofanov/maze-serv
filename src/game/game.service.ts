@@ -37,7 +37,6 @@ export class GameService {
     async getAvailableGames(): Promise<Game[]> {
         return this.gameModel.findAll({
             where: {
-                player2Id: null,
                 status: 'waiting_for_player',
             },
         });
