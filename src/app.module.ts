@@ -5,6 +5,7 @@ import { ConfigModule } from "@nestjs/config";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import * as path from 'path';
 import { SequelizeModule } from "@nestjs/sequelize";
+import { GameGateway } from './game/game.gateway';
 import * as process from 'process';
 
 @Module({
@@ -26,6 +27,6 @@ import * as process from 'process';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GameGateway],
 })
 export class AppModule {}
