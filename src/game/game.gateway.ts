@@ -1,17 +1,35 @@
 import { SubscribeMessage, WebSocketGateway, OnGatewayConnection, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { GameService } from './game.service'; // Якщо у вас є такий сервіс для роботи з моделлю Game
+import { GameService } from './game.service';
+import { UsersService } from '../users/users.service';
 
-@WebSocketGateway() // використовуйте порт, наприклад, @WebSocketGateway(4001), якщо потрібно
+@WebSocketGateway() // can choose port @WebSocketGateway(4001), for example
 export class GameGateway implements OnGatewayConnection {
 
   @WebSocketServer()
   server: Server;
 
-  constructor(private readonly gameService: GameService) {}
+  constructor(private readonly gameService: GameService, private readonly usersService: UsersService) {}
 
-  async handleConnection(client: any) {
+  async handleConnection(client: any,  ...args: any[]) {
     console.log('Client connected:', client);
+    console.log('args[0]:', args[0]);
+
+    const userName = args[0]?.userName;
+    if (!userName) {
+      client.emit('error', 'Username is required');
+      client.disconnect();
+      return;
+    }
+
+    const user  = await this.usersService.createUserIfNotExists({ userName: userName });
+    if (!user) {
+      client.emit('error', 'Username is already taken or another error occurred.');
+      client.disconnect();
+      return;
+    } else {
+      client.emit('success', 'User successfully created.');
+    }
 
     const availableGames = await this.gameService.getAvailableGames();
     if (availableGames && availableGames.length) {
