@@ -1,37 +1,25 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Game } from './game.model';
-import { Maze } from '../maze/maze.model';
-import {Mazes} from "../lib/mazes";
+import { MazeService } from '../maze/maze.service';
 
 @Injectable()
 export class GameService {
     constructor(
         @InjectModel(Game)
         private readonly gameModel: typeof Game,
-        @InjectModel(Maze)
-        private readonly mazeModel: typeof Maze,
+        private readonly mazeService: MazeService,
     ) {}
 
     async createGame(payload: any): Promise<Game> {
-        const {player1Id} = payload;
-        const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
-        if (!randomMazeData) {
-            throw new NotFoundException('Maze not found');
-        }
+        const { player1Id } = payload;
+        const randomMaze = await this.mazeService.createRandomMaze();
 
-        const newMazeInstance = new Maze();
-        newMazeInstance.maze = randomMazeData;
-        const randomMaze = await newMazeInstance.save();
-
-
-        const newGame = await this.gameModel.create({
+        return this.gameModel.create({
             mazeId: randomMaze.id,
             player1Id,
             status: 'waiting_for_player',
         });
-
-        return newGame;
     }
 
     async getAvailableGames(): Promise<Game[]> {
@@ -41,5 +29,5 @@ export class GameService {
             },
         });
     }
-
 }
+
