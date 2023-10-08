@@ -1,8 +1,10 @@
-import {Injectable, NotFoundException} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import {Game} from './game.model';
+import { Game } from './game.model';
 import { MazeService } from '../maze/maze.service';
-import {PlayerType} from "../players/player.model";
+import { PlayerType } from '../players/player.model';
+import { MazeCell } from '../lib/mazes';
+import { Maze } from '../maze/maze.model';
 
 @Injectable()
 export class GameService {
@@ -38,13 +40,30 @@ export class GameService {
             throw new NotFoundException(`Game with ID ${gameId} not found`);
         }
 
-        game.currentPlayer = game.currentPlayer === PlayerType.PLAYER1
-            ? PlayerType.PLAYER2
-            : PlayerType.PLAYER1;
+        game.currentPlayer = game.currentPlayer === PlayerType.PLAYER1 ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
 
         await game.save();
 
         return game;
     }
-}
 
+    async findPlayerPosition(gameId: number): Promise<{ x: number; y: number } | null> {
+        const game = await this.gameModel.findByPk(gameId, { include: [Maze] });
+        if (!game || !game.maze) {
+            throw new NotFoundException(`Game with ID ${gameId} or its maze not found`);
+        }
+
+        return this._findPlayerPosition(game.maze.maze, game.currentPlayer);
+    }
+
+    private _findPlayerPosition(maze: MazeCell[][], player: PlayerType): { x: number; y: number } | null {
+        for (let y = 0; y < maze.length; y++) {
+            for (let x = 0; x < maze[y].length; x++) {
+                if (maze[y][x].player === player) {
+                    return { x, y };
+                }
+            }
+        }
+        return null;
+    }
+}
