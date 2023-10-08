@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Game } from './game.model';
+import {Game} from './game.model';
 import { MazeService } from '../maze/maze.service';
+import {PlayerType} from "../players/player.model";
 
 @Injectable()
 export class GameService {
@@ -28,6 +29,22 @@ export class GameService {
                 status: 'waiting_for_player',
             },
         });
+    }
+
+    async togglePlayer(gameId: number): Promise<Game> {
+        const game = await this.gameModel.findByPk(gameId);
+
+        if (!game) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
+        }
+
+        game.currentPlayer = game.currentPlayer === PlayerType.PLAYER1
+            ? PlayerType.PLAYER2
+            : PlayerType.PLAYER1;
+
+        await game.save();
+
+        return game;
     }
 }
 
