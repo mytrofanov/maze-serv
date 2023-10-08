@@ -29,13 +29,6 @@ export class Game extends Model {
     @BelongsTo(() => Player)
     player2: Player;
 
-    @ForeignKey(() => GameLog)
-    @Column({ type: DataType.INTEGER })
-    gameLogId: number;
-
-    @BelongsTo(() => GameLog)
-    gameLog: GameLog;
-
     @Column(DataType.ENUM('waiting_for_player', 'in_progress', 'completed', 'connection_error'))
     status: string;
 }

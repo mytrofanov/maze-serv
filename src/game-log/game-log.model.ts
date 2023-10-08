@@ -1,4 +1,6 @@
-import { Table, Column, Model, PrimaryKey, AutoIncrement, Unique, DataType } from 'sequelize-typescript';
+import {Table, Column, Model, DataType, ForeignKey, BelongsTo} from 'sequelize-typescript';
+import {Player} from "../players/player.model";
+import {Game} from "../game/game.model";
 
 export enum PlayerType {
     PLAYER1 = 1,
@@ -19,10 +21,14 @@ export class GameLog extends Model {
     id: number;
 
     @Column({ type: DataType.INTEGER })
-    playerId: PlayerType;
+    playerType: PlayerType;
 
-    @Column({ type: DataType.STRING })
-    playerAvatar: string;
+    @ForeignKey(() => Player)
+    @Column({ type: DataType.INTEGER, allowNull: false })
+    playerId: number;
+
+    @BelongsTo(() => Player)
+    player: Player;
 
     @Column({ type: DataType.STRING, allowNull: true })
     direction: Direction | null;
@@ -32,6 +38,13 @@ export class GameLog extends Model {
 
     @Column({ type: DataType.JSON, allowNull: true })
     position: Position | null;
+
+    @ForeignKey(() => Game)
+    @Column
+    gameId: number;
+
+    @BelongsTo(() => Game)
+    game: Game;
 
     @Column({ type: DataType.DATE })
     created: Date;
