@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Maze } from './maze.model';
-import { Direction, MazeCell, Mazes, PlayerType } from '../lib/mazes';
+import { Cell, Direction, MazeCell, Mazes, PlayerType } from '../lib/mazes';
 import { Position } from '../game-log/game-log.model';
 import { updateMazeCell } from '../utils';
 
@@ -37,7 +37,7 @@ export class MazeService {
         revealed: boolean,
         prevPosition?: Position,
         direction?: Direction,
-        player?: PlayerType,
+        currentPlayer?: PlayerType,
     ): Promise<Maze> {
         const mazeInstance = await this.getMazeById(mazeId);
         const currentMazeData: MazeCell[][] = mazeInstance.maze;
@@ -48,7 +48,7 @@ export class MazeService {
             revealed,
             prevPosition,
             direction,
-            player,
+            currentPlayer,
         );
 
         mazeInstance.maze = updatedMazeData;

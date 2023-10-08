@@ -5,6 +5,8 @@ import { MazeService } from '../maze/maze.service';
 import { PlayerType } from '../players/player.model';
 import { MazeCell } from '../lib/mazes';
 import { Maze } from '../maze/maze.model';
+import { findPlayerPosition } from '../utils';
+import { Position } from '../game-log/game-log.model';
 
 @Injectable()
 export class GameService {
@@ -33,37 +35,43 @@ export class GameService {
         });
     }
 
-    async togglePlayer(gameId: number): Promise<Game> {
+    async findGame(gameId: number): Promise<Game> {
         const game = await this.gameModel.findByPk(gameId);
 
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);
         }
 
-        game.currentPlayer = game.currentPlayer === PlayerType.PLAYER1 ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
-
-        await game.save();
-
         return game;
     }
 
-    async findPlayerPosition(gameId: number): Promise<{ x: number; y: number } | null> {
+    async togglePlayer(gameId: number): Promise<Game> {
+        const game = await this.findGame(gameId);
+
+        game.currentPlayer = game.currentPlayer === PlayerType.PLAYER1 ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
+        await game.save();
+        return game;
+    }
+
+    async findPlayerPosition(gameId: number): Promise<{ playerPosition: Position; currentPlayer: PlayerType } | null> {
         const game = await this.gameModel.findByPk(gameId, { include: [Maze] });
         if (!game || !game.maze) {
             throw new NotFoundException(`Game with ID ${gameId} or its maze not found`);
         }
-
-        return this._findPlayerPosition(game.maze.maze, game.currentPlayer);
+        const currentPlayer = game.currentPlayer;
+        const playerPosition = findPlayerPosition(game.maze.maze, currentPlayer);
+        return { playerPosition, currentPlayer };
     }
 
-    private _findPlayerPosition(maze: MazeCell[][], player: PlayerType): { x: number; y: number } | null {
-        for (let y = 0; y < maze.length; y++) {
-            for (let x = 0; x < maze[y].length; x++) {
-                if (maze[y][x].player === player) {
-                    return { x, y };
-                }
-            }
+    async setWinner(gameId: number, winner: PlayerType): Promise<Game> {
+        const game = await this.gameModel.findByPk(gameId);
+        if (!game) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
         }
-        return null;
+
+        game.winner = winner;
+        await game.save();
+
+        return game;
     }
 }

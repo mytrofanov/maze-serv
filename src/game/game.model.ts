@@ -43,6 +43,13 @@ export class Game extends Model {
     })
     currentPlayer: PlayerType;
 
+    @Column({
+        type: DataType.ENUM,
+        values: Object.values(PlayerType),
+        allowNull: true,
+    })
+    winner: PlayerType;
+
     @Column(DataType.ENUM(...Object.values(GameStatus)))
     status: GameStatus;
 }
