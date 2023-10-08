@@ -3,6 +3,11 @@ import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 
+export enum ErrorCodes {
+  USERNAME_REQUIRED = 'USERNAME_REQUIRED',
+  USERNAME_TAKEN = 'USERNAME_TAKEN',
+}
+
 @WebSocketGateway() // can choose port @WebSocketGateway(4001), for example
 export class GameGateway implements OnGatewayConnection {
 
@@ -17,14 +22,14 @@ export class GameGateway implements OnGatewayConnection {
 
     const userName = args[0]?.userName;
     if (!userName) {
-      client.emit('error', 'Username is required');
+      client.emit('error', { code: ErrorCodes.USERNAME_REQUIRED, message: 'Username is required' });
       client.disconnect();
       return;
     }
 
     const user  = await this.usersService.createUserIfNotExists({ userName: userName });
     if (!user) {
-      client.emit('error', 'Username is already taken or another error occurred.');
+      client.emit('error', { code: ErrorCodes.USERNAME_TAKEN, message: 'Username is already taken or another error occurred.' });
       client.disconnect();
       return;
     } else {
