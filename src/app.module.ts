@@ -10,6 +10,7 @@ import * as process from 'process';
 import {UsersModule} from "./users/users.module";
 import {GameModule} from "./game/game.module";
 import {MazeModule} from "./maze/maze.module";
+import {PlayerModule} from "./players/player.module";
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -30,7 +31,8 @@ import {MazeModule} from "./maze/maze.module";
     }),
       UsersModule,
       GameModule,
-      MazeModule
+      MazeModule,
+      PlayerModule
   ],
   controllers: [AppController],
   providers: [AppService],

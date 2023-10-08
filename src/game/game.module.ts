@@ -8,11 +8,12 @@ import {Game} from "./game.model";
 import {SequelizeModule} from "@nestjs/sequelize";
 import { MazeModule } from '../maze/maze.module';
 import {GameLogModule} from "../game-log/game-log.module";
+import {PlayerModule} from "../players/player.module";
 
 @Module({
     imports: [
         SequelizeModule.forFeature([Game, Maze, Player, GameLog]),
-        MazeModule, GameLogModule
+        MazeModule, GameLogModule, PlayerModule
     ],
     providers: [GameGateway, GameService],
 })
