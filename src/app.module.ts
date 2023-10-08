@@ -7,6 +7,9 @@ import * as path from 'path';
 import { SequelizeModule } from "@nestjs/sequelize";
 import { GameGateway } from './game/game.gateway';
 import * as process from 'process';
+import {UsersModule} from "./users/users.module";
+import {GameModule} from "./game/game.module";
+import {MazeModule} from "./maze/maze.module";
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -25,8 +28,11 @@ import * as process from 'process';
       models: [],
       autoLoadModels: true,
     }),
+      UsersModule,
+      GameModule,
+      MazeModule
   ],
   controllers: [AppController],
-  providers: [AppService, GameGateway],
+  providers: [AppService],
 })
 export class AppModule {}
