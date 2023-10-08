@@ -17,11 +17,3 @@ export class Maze extends Model {
         this.mazeData = JSON.stringify(value);
     }
 }
-
-// const exampleMazes = [newMaze, newMazeA, newMazeB, ...];
-//
-// const randomMazeData = exampleMazes[Math.floor(Math.random() * exampleMazes.length)];
-//
-// const newMazeInstance = new Maze();
-// newMazeInstance.maze = randomMazeData;
-// await newMazeInstance.save();
