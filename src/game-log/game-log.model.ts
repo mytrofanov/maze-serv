@@ -1,7 +1,7 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { Player, PlayerType } from '../players/player.model';
 import { Game } from '../game/game.model';
 import { Direction, Position } from '../cell/cell.model';
+import { PlayerType, User } from '../users/users.model';
 
 @Table({ tableName: 'GameLog', timestamps: true })
 export class GameLog extends Model {
@@ -11,12 +11,12 @@ export class GameLog extends Model {
     @Column({ type: DataType.INTEGER })
     playerType: PlayerType;
 
-    @ForeignKey(() => Player)
+    @ForeignKey(() => User)
     @Column({ type: DataType.INTEGER, allowNull: false })
     playerId: number;
 
-    @BelongsTo(() => Player)
-    player: Player;
+    @BelongsTo(() => User)
+    user: User;
 
     @Column({ type: DataType.STRING, allowNull: true })
     direction: Direction | null;

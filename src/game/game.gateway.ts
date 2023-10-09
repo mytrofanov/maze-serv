@@ -34,8 +34,9 @@ export class GameGateway implements OnGatewayConnection {
 
     async handleConnection(client: any, ...args: any[]) {
         console.log('Client connected:', client.handshake.query);
+        const connectionPayload = client.handshake.query;
+        const { userName, userId } = connectionPayload;
 
-        const userName = client.handshake.query.userName;
         console.log('Username:', userName);
 
         if (!userName) {
@@ -47,7 +48,7 @@ export class GameGateway implements OnGatewayConnection {
             return;
         }
 
-        const user = await this.usersService.createUserIfNotExists({ userName: userName });
+        const user = await this.usersService.createUserIfNotExists({ userName: userName, userId: userId });
         if (!user) {
             client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.USERNAME_TAKEN,
@@ -75,6 +76,7 @@ export class GameGateway implements OnGatewayConnection {
 
     @SubscribeMessage(SocketEvents.CREATE_GAME)
     async handleCreateGame(client: any, payload: CreateGamePayload): Promise<any> {
+        console.log('handleCreateGame: ', payload);
         const newGame = await this.gameService.createGame(payload);
         const newMaze = await this.mazeCellService.createRandomMaze(newGame.id);
         if (!newGame || newMaze) {

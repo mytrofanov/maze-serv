@@ -1,11 +1,11 @@
 import { ConflictException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Game, GameStatus } from './game.model';
-import { PlayerType } from '../players/player.model';
 import { MazeCellService } from '../cell/cell.service';
 import { UsersService } from '../users/users.service';
-import { ConnectToGamePayload } from './socket-types';
+import { ConnectToGamePayload, CreateGamePayload } from './socket-types';
 import { GameLog } from '../game-log/game-log.model';
+import { PlayerType } from '../users/users.model';
 
 @Injectable()
 export class GameService {
@@ -17,7 +17,7 @@ export class GameService {
         private readonly usersService: UsersService,
     ) {}
 
-    async createGame(payload: any): Promise<Game> {
+    async createGame(payload: CreateGamePayload): Promise<Game> {
         const { player1Id } = payload;
 
         const newGame = await this.gameModel.create({

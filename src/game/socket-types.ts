@@ -1,6 +1,6 @@
-import { PlayerType } from '../players/player.model';
 import { GameStatus } from './game.model';
 import { Direction } from '../cell/cell.model';
+import { PlayerType } from '../users/users.model';
 
 export enum SocketEvents {
     AVAILABLE_GAMES = 'AVAILABLE_GAMES',

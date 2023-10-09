@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { GameLog } from './game-log.model';
-import { PlayerType } from '../players/player.model';
 import { Direction } from '../cell/cell.model';
+import { PlayerType } from '../users/users.model';
 
 @Injectable()
 export class GameLogService {

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './users.model';
 import { InjectModel } from '@nestjs/sequelize';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CheckUserDto, CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -31,11 +31,13 @@ export class UsersService {
         const user = await this.getUserByName(userName);
         return !!user;
     }
-    async createUserIfNotExists(userDto: CreateUserDto): Promise<User | null> {
-        if (await this.isUserNameTaken(userDto.userName)) {
+    async createUserIfNotExists(userDto: CheckUserDto): Promise<User | null> {
+        if (!userDto.userId && (await this.isUserNameTaken(userDto.userName))) {
             return null;
         }
-
-        return this.createUser(userDto);
+        if (!userDto.userId) {
+            return this.createUser(userDto);
+        }
+        return this.getUserById(userDto.userId);
     }
 }
