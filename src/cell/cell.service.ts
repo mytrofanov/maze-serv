@@ -77,4 +77,19 @@ export class MazeCellService {
 
         return maze;
     }
+
+    async findPlayerPosition(gameId: number, player: PlayerType): Promise<Position | null> {
+        const cell = await this.mazeCellModel.findOne({
+            where: {
+                gameId: gameId,
+                player: player,
+            },
+        });
+
+        if (!cell) {
+            throw new NotFoundException(`Cell with player ${player} not found in the game with ID ${gameId}`);
+        }
+
+        return cell.position;
+    }
 }
