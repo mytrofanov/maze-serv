@@ -55,7 +55,26 @@ export class MazeCellService {
         return this.mazeCellModel.bulkCreate(cellsData);
     }
 
-    async returnMaze(data: { gameId: number; position: Position; type: Cell }): Promise<MazeCell> {
-        return this.mazeCellModel.create(data);
+    async returnMaze(gameId: number): Promise<MazeCell[][]> {
+        const cells = await this.mazeCellModel.findAll({
+            where: { gameId: gameId },
+            order: [['position', 'ASC']],
+        });
+
+        if (!cells.length) {
+            throw new NotFoundException('No cells found for the provided gameId.');
+        }
+
+        const maze: MazeCell[][] = [];
+
+        cells.forEach(cell => {
+            const position = cell.position;
+            if (!maze[position.y]) {
+                maze[position.y] = [];
+            }
+            maze[position.y][position.x] = cell;
+        });
+
+        return maze;
     }
 }
