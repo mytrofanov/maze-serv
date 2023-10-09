@@ -2,7 +2,6 @@ import { SubscribeMessage, WebSocketGateway, OnGatewayConnection, WebSocketServe
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
-import { Direction } from '../lib/mazes';
 import { newPosition } from '../utils';
 import { GameLogService } from '../game-log/game-log.service';
 import { MazeCellService } from '../cell/cell.service';

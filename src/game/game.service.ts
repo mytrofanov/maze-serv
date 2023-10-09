@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Game, GameStatus } from './game.model';
 import { PlayerType } from '../players/player.model';
@@ -12,6 +12,7 @@ export class GameService {
     constructor(
         @InjectModel(Game)
         private readonly gameModel: typeof Game,
+        @Inject(forwardRef(() => MazeCellService))
         private readonly mazeCellService: MazeCellService,
         private readonly usersService: UsersService,
     ) {}

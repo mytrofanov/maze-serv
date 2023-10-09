@@ -4,11 +4,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import * as path from 'path';
 import { SequelizeModule } from '@nestjs/sequelize';
 import * as process from 'process';
-import { UsersModule } from './users/users.module';
 import { GameModule } from './game/game.module';
-import { MazeModule } from './maze/maze.module';
-import { PlayerModule } from './players/player.module';
-import { MazeCellModule } from './cell/cell.module';
 
 @Module({
     imports: [
@@ -28,11 +24,7 @@ import { MazeCellModule } from './cell/cell.module';
             models: [],
             autoLoadModels: true,
         }),
-        UsersModule,
         GameModule,
-        MazeModule,
-        PlayerModule,
-        MazeCellModule,
     ],
 })
 export class AppModule {}

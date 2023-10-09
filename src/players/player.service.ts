@@ -1,8 +1,7 @@
-import {BadRequestException, Injectable, NotFoundException} from '@nestjs/common';
-import {InjectModel} from '@nestjs/sequelize';
-import {Game, GameStatus} from '../game/game.model';
-import {Player, PlayerType} from './player.model';
-import {User} from '../users/users.model';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
+import { Game, GameStatus } from '../game/game.model';
+import { Player, PlayerType } from './player.model';
 
 @Injectable()
 export class PlayerService {
@@ -11,8 +10,6 @@ export class PlayerService {
         private readonly gameModel: typeof Game,
         @InjectModel(Player)
         private readonly playerModel: typeof Player,
-        @InjectModel(User)
-        private readonly userModel: typeof User,
     ) {}
 
     async addPlayerToGame(userId: number, gameId: number): Promise<Game> {
@@ -34,11 +31,8 @@ export class PlayerService {
             await game.save();
 
             return game;
-        }
-
-        else {
+        } else {
             throw new BadRequestException('The selected game is not available to join or is already in progress.');
         }
     }
-
 }

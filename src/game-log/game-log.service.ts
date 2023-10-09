@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { GameLog } from './game-log.model';
-import { Game } from '../game/game.model';
 import { PlayerType } from '../players/player.model';
 import { Direction } from '../cell/cell.model';
 
@@ -10,8 +9,6 @@ export class GameLogService {
     constructor(
         @InjectModel(GameLog)
         private readonly gameLogModel: typeof GameLog,
-        @InjectModel(Game)
-        private readonly gameModel: typeof Game,
     ) {}
 
     async createLog(

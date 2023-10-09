@@ -1,5 +1,5 @@
-import { Direction } from '../cell/cell.model';
 import { PlayerType } from '../players/player.model';
+import { Direction } from '../cell/cell.model';
 
 export enum Cell {
     WALL = 1,
