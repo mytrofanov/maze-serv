@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { MazeCell, Cell, Direction, Position } from './cell.model';
 import { PlayerType } from '../players/player.model';
+import { Mazes } from '../lib/mazes';
 
 @Injectable()
 export class MazeCellService {
@@ -34,5 +35,27 @@ export class MazeCellService {
 
     async revealCell(cellId: number): Promise<MazeCell> {
         return this.updateCell(cellId, { revealed: true });
+    }
+
+    async createRandomMaze(gameId: number): Promise<MazeCell[]> {
+        const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
+
+        if (!randomMazeData) {
+            throw new NotFoundException('Maze not found');
+        }
+
+        const cellsData = randomMazeData.flatMap((rowY, indexY) => {
+            return rowY.map((colX, indexX) => ({
+                position: JSON.stringify({ y: indexY, x: indexX }),
+                gameId: gameId,
+                ...colX,
+            }));
+        });
+
+        return this.mazeCellModel.bulkCreate(cellsData);
+    }
+
+    async returnMaze(data: { gameId: number; position: Position; type: Cell }): Promise<MazeCell> {
+        return this.mazeCellModel.create(data);
     }
 }

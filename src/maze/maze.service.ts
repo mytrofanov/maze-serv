@@ -12,16 +12,16 @@ export class MazeService {
         private readonly mazeModel: typeof Maze,
     ) {}
 
-    async createRandomMaze(): Promise<Maze> {
-        const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
-        if (!randomMazeData) {
-            throw new NotFoundException('Maze not found');
-        }
-
-        const newMazeInstance = new Maze();
-        newMazeInstance.maze = randomMazeData;
-        return newMazeInstance.save();
-    }
+    // async createRandomMaze(): Promise<Maze> {
+    //     const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
+    //     if (!randomMazeData) {
+    //         throw new NotFoundException('Maze not found');
+    //     }
+    //
+    //     const newMazeInstance = new Maze();
+    //     newMazeInstance.maze = randomMazeData;
+    //     return newMazeInstance.save();
+    // }
 
     async getMazeById(mazeId: number): Promise<Maze> {
         const maze = await this.mazeModel.findByPk(mazeId);
