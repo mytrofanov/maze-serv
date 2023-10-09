@@ -95,7 +95,7 @@ export class MazeCellService {
         return cell.position;
     }
     async handleDirectionChange(
-        gameId: string,
+        gameId: number,
         direction: Direction,
         startPosition: Position,
         updatedPosition: Position,

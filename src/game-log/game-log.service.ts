@@ -15,9 +15,9 @@ export class GameLogService {
     ) {}
 
     async createLog(
-        gameId: string,
+        gameId: number,
         currentPlayer: PlayerType,
-        playerId: string,
+        playerId: number,
         direction?: Direction,
         newX?: number,
         newY?: number,
@@ -39,5 +39,14 @@ export class GameLogService {
         };
 
         return this.gameLogModel.create(log);
+    }
+
+    async getGameLogs(gameId: number): Promise<GameLog[]> {
+        return this.gameLogModel.findAll({
+            where: {
+                gameId: gameId,
+            },
+            order: [['created', 'DESC']],
+        });
     }
 }

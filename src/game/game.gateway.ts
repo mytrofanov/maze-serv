@@ -10,6 +10,7 @@ import {
     ConnectToGamePayload,
     CreateGamePayload,
     DirectionPayload,
+    MessagePayload,
     SocketErrorCodes,
     SocketEvents,
     SocketSuccessCodes,
@@ -119,13 +120,21 @@ export class GameGateway implements OnGatewayConnection {
 
         await this.mazeCellService.handleDirectionChange(gameId, direction, startPosition, updatedPosition, playerType);
 
-        client.emit(SocketEvents.SUCCESS, {
-            code: SocketSuccessCodes.USER_CREATED,
-            message: 'User successfully created.',
-            payload: {
-                user: user,
-            },
-        });
+        const updatedGameState = await this.gameService.togglePlayer(gameId);
+        const updatedMaze = await this.mazeCellService.getMazeById(gameId);
+
+        client.emit(SocketEvents.GAME_UPDATED, { game: updatedGameState, maze: updatedMaze });
+    }
+
+    @SubscribeMessage(SocketEvents.SEND_MESSAGE)
+    async handleCreateLog(client: any, payload: MessagePayload): Promise<any> {
+        const { gameId, playerId, playerType, message } = payload;
+
+        await this.logService.createLog(gameId, playerType, playerId, undefined, undefined, undefined, message);
+
+        const allLogs = await this.logService.getGameLogs(gameId);
+
+        client.emit(SocketEvents.LOG_UPDATED, allLogs);
     }
 
     @SubscribeMessage(SocketEvents.CREATE_USER)

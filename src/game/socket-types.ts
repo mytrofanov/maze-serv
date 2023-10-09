@@ -13,7 +13,17 @@ export enum SocketEvents {
     ERROR = 'ERROR',
     GAME_CREATED = 'GAME_CREATED',
     GAME_CONNECTED = 'GAME_CONNECTED',
+    GAME_UPDATED = 'GAME_UPDATED',
+    LOG_UPDATED = 'LOG_UPDATED',
     SUCCESS = 'SUCCESS',
+    SEND_MESSAGE = 'SEND_MESSAGE',
+}
+
+export interface MessagePayload {
+    gameId: number;
+    playerId: number;
+    playerType: PlayerType;
+    message: string;
 }
 
 export type CreateGamePayload = {
@@ -69,8 +79,8 @@ export type Game = {
 
 export interface DirectionPayload {
     direction: Direction;
-    gameId: string;
-    playerId: string;
+    gameId: number;
+    playerId: number;
     playerType: PlayerType;
     message?: string;
 }

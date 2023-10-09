@@ -1,6 +1,7 @@
 import { Model, Column, DataType, Table, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import { Player, PlayerType } from '../players/player.model';
 import { MazeCell } from '../cell/cell.model';
+import { GameLog } from '../game-log/game-log.model';
 
 export enum GameStatus {
     WAITING_FOR_PLAYER = 'WAITING_FOR_PLAYER',
@@ -48,4 +49,7 @@ export class Game extends Model {
 
     @HasMany(() => MazeCell)
     cells: MazeCell[];
+
+    @HasMany(() => GameLog)
+    logs: GameLog[];
 }

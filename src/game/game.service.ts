@@ -5,6 +5,7 @@ import { PlayerType } from '../players/player.model';
 import { MazeCellService } from '../cell/cell.service';
 import { UsersService } from '../users/users.service';
 import { ConnectToGamePayload } from './socket-types';
+import { GameLog } from '../game-log/game-log.model';
 
 @Injectable()
 export class GameService {
@@ -37,7 +38,9 @@ export class GameService {
     }
 
     async findGame(gameId: number): Promise<Game> {
-        const game = await this.gameModel.findByPk(gameId);
+        const game = await this.gameModel.findByPk(gameId, {
+            include: [GameLog],
+        });
 
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);
@@ -54,7 +57,7 @@ export class GameService {
         return game;
     }
 
-    async setWinner(gameId: string, winner: PlayerType): Promise<Game> {
+    async setWinner(gameId: number, winner: PlayerType): Promise<Game> {
         const game = await this.gameModel.findByPk(gameId);
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);
