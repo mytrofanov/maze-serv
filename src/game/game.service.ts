@@ -54,7 +54,7 @@ export class GameService {
         return game;
     }
 
-    async setWinner(gameId: number, winner: PlayerType): Promise<Game> {
+    async setWinner(gameId: string, winner: PlayerType): Promise<Game> {
         const game = await this.gameModel.findByPk(gameId);
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);

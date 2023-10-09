@@ -117,6 +117,8 @@ export class GameGateway implements OnGatewayConnection {
             message,
         );
 
+        await this.mazeCellService.handleDirectionChange(gameId, direction, startPosition, updatedPosition, playerType);
+
         client.emit(SocketEvents.SUCCESS, {
             code: SocketSuccessCodes.USER_CREATED,
             message: 'User successfully created.',

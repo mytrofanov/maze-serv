@@ -1,14 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { MazeCell, Cell, Direction, Position } from './cell.model';
+import { Cell, Direction, MazeCell, Position } from './cell.model';
 import { PlayerType } from '../players/player.model';
 import { Mazes } from '../lib/mazes';
+import { GameService } from '../game/game.service';
 
 @Injectable()
 export class MazeCellService {
     constructor(
         @InjectModel(MazeCell)
         private readonly mazeCellModel: typeof MazeCell,
+        private readonly gameService: GameService,
     ) {}
 
     // async createCell(data: { gameId: number; position: Position; type: Cell }): Promise<MazeCell> {
@@ -92,7 +94,54 @@ export class MazeCellService {
 
         return cell.position;
     }
-    async handleDirectionChange () =>{
+    async handleDirectionChange(
+        gameId: string,
+        direction: Direction,
+        startPosition: Position,
+        updatedPosition: Position,
+        currentPlayer: PlayerType,
+    ) {
+        const prevCell = await this.mazeCellModel.findOne({
+            where: {
+                position: startPosition,
+                gameId: gameId,
+            },
+        });
+        const newCell = await this.mazeCellModel.findOne({
+            where: {
+                position: updatedPosition,
+                gameId: gameId,
+            },
+        });
 
-}
+        if (!newCell || !prevCell) {
+            throw new NotFoundException(
+                `Cell with position ${updatedPosition} or ${startPosition} not found in the game with ID ${gameId}`,
+            );
+        }
+
+        if (newCell.type !== Cell.WALL) {
+            if (newCell.type === Cell.EXIT) {
+                await this.gameService.setWinner(
+                    gameId,
+                    currentPlayer === PlayerType.PLAYER1 ? PlayerType.PLAYER1 : PlayerType.PLAYER2,
+                );
+            }
+            //move player to new cell
+            await this.updateCell(newCell.id, {
+                revealed: true,
+                player: currentPlayer,
+            });
+            //clear prev cell
+            await this.updateCell(prevCell.id, {
+                revealed: true,
+                player: undefined,
+                direction: direction,
+            });
+        }
+        //if wall
+        await this.updateCell(newCell.id, {
+            revealed: true,
+        });
+    }
 }

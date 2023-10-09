@@ -69,8 +69,8 @@ export type Game = {
 
 export interface DirectionPayload {
     direction: Direction;
-    gameId: number;
-    playerId: number;
+    gameId: string;
+    playerId: string;
     playerType: PlayerType;
     message?: string;
 }

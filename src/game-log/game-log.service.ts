@@ -15,9 +15,9 @@ export class GameLogService {
     ) {}
 
     async createLog(
-        gameId: number,
+        gameId: string,
         currentPlayer: PlayerType,
-        playerId: number,
+        playerId: string,
         direction?: Direction,
         newX?: number,
         newY?: number,
