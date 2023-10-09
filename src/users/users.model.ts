@@ -17,6 +17,11 @@ export class User extends Model<User, UserCreationAttribute> {
     @Column({ type: DataType.STRING, unique: true, allowNull: false })
     userName: string;
 
-    @Column({ type: DataType.ENUM, values: Object.values(PlayerType), allowNull: false })
+    @Column({
+        type: DataType.ENUM,
+        values: Object.values(PlayerType),
+        allowNull: false,
+        defaultValue: PlayerType.PLAYER1,
+    })
     type: PlayerType;
 }
