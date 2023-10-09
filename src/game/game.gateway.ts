@@ -15,7 +15,12 @@ import {
     SocketSuccessCodes,
 } from './socket-types';
 
-@WebSocketGateway() // can choose port @WebSocketGateway(4001), for example
+@WebSocketGateway({
+    cors: {
+        origin: 'http://localhost:5173',
+        credentials: true,
+    },
+}) // can choose port @WebSocketGateway(4001), for example
 export class GameGateway implements OnGatewayConnection {
     @WebSocketServer()
     server: Server;
@@ -28,10 +33,11 @@ export class GameGateway implements OnGatewayConnection {
     ) {}
 
     async handleConnection(client: any, ...args: any[]) {
-        console.log('Client connected:', client);
-        console.log('args[0]:', args[0]);
+        console.log('Client connected:', client.handshake.query);
 
-        const userName = args[0]?.userName;
+        const userName = client.handshake.query.userName;
+        console.log('Username:', userName);
+
         if (!userName) {
             client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.USERNAME_REQUIRED,
