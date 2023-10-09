@@ -3,9 +3,9 @@ import { Game } from '../game/game.model';
 import { PlayerType } from '../users/users.model';
 
 export enum Cell {
-    WALL = '1',
-    PATH = '0',
-    EXIT = '-1',
+    WALL = 1,
+    PATH = 0,
+    EXIT = -1,
 }
 
 export enum Direction {
@@ -44,8 +44,8 @@ export class MazeCell extends Model {
     @Column({ type: DataType.JSON })
     position: Position;
 
-    @Column({ type: DataType.ENUM, values: Object.values(Cell) })
-    type: Cell;
+    @Column({ type: DataType.INTEGER })
+    type: number;
 
     @Column({ type: DataType.BOOLEAN })
     revealed: boolean;

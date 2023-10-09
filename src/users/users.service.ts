@@ -35,15 +35,19 @@ export class UsersService {
     }
     async createUserIfNotExists(userDto: CheckUserDto): Promise<User | null> {
         const userId = checkForNullUndefined(userDto.userId);
-        if (!userId && (await this.isUserNameTaken(userDto.userName))) {
-            return null;
-        }
-        if (!userId) {
-            return this.createUser(userDto);
-        }
         if (userId) {
             console.log('userDto.userId: ', userDto.userId);
             return this.getUserById(userDto.userId);
+        }
+
+        if (!userId) {
+            const nameIsTaken = await this.isUserNameTaken(userDto.userName);
+            if (nameIsTaken) {
+                console.log('isUserNameTaken', nameIsTaken);
+                return null;
+            } else {
+                return this.createUser(userDto);
+            }
         }
     }
 }

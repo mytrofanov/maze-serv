@@ -78,7 +78,9 @@ export class GameGateway implements OnGatewayConnection {
     async handleCreateGame(client: any, payload: CreateGamePayload): Promise<any> {
         console.log('handleCreateGame: ', payload);
         const newGame = await this.gameService.createGame(payload);
-        const newMaze = await this.mazeCellService.createRandomMaze(newGame.id);
+        // await this.mazeCellService.createRandomMaze(newGame.id);
+        const newMaze = await this.mazeCellService.getMazeById(newGame.id);
+        console.log('newMaze: ', newMaze);
         if (!newGame || newMaze) {
             client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.GAME_NOT_CREATED,

@@ -5,7 +5,7 @@ import { MazeCellService } from '../cell/cell.service';
 import { UsersService } from '../users/users.service';
 import { ConnectToGamePayload, CreateGamePayload } from './socket-types';
 import { GameLog } from '../game-log/game-log.model';
-import { PlayerType } from '../users/users.model';
+import { PlayerType, User } from '../users/users.model';
 
 @Injectable()
 export class GameService {
@@ -35,6 +35,13 @@ export class GameService {
             where: {
                 status: GameStatus.WAITING_FOR_PLAYER,
             },
+            include: [
+                {
+                    model: User,
+                    as: 'player1',
+                    attributes: ['userName'],
+                },
+            ],
         });
     }
 

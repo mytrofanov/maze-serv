@@ -61,7 +61,7 @@ export class MazeCellService {
     async getMazeById(gameId: number): Promise<MazeCell[][]> {
         const cells = await this.mazeCellModel.findAll({
             where: { gameId: gameId },
-            order: [['position', 'ASC']],
+            // order: [['position', 'ASC']],
         });
 
         if (!cells.length) {
