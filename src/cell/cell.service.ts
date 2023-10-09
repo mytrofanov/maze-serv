@@ -11,9 +11,9 @@ export class MazeCellService {
         private readonly mazeCellModel: typeof MazeCell,
     ) {}
 
-    async createCell(data: { gameId: number; position: Position; type: Cell }): Promise<MazeCell> {
-        return this.mazeCellModel.create(data);
-    }
+    // async createCell(data: { gameId: number; position: Position; type: Cell }): Promise<MazeCell> {
+    //     return this.mazeCellModel.create(data);
+    // }
 
     async updateCell(cellId: number, changes: Partial<MazeCell>): Promise<MazeCell> {
         const cell = await this.mazeCellModel.findByPk(cellId);

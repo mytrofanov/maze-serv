@@ -5,16 +5,8 @@ import { UsersService } from '../users/users.service';
 import { Direction } from '../lib/mazes';
 import { newPosition } from '../utils';
 import { GameLogService } from '../game-log/game-log.service';
-
-export enum SocketErrorCodes {
-    USERNAME_REQUIRED = 'USERNAME_REQUIRED',
-    USERNAME_TAKEN = 'USERNAME_TAKEN',
-    PLAYER_IS_NOT_FOUND = 'PLAYER_IS_NOT_FOUND',
-}
-
-export enum SocketSuccessCodes {
-    USER_CREATED = 'USER_CREATED',
-}
+import { MazeCellService } from '../cell/cell.service';
+import { SocketErrorCodes, SocketEvents, SocketSuccessCodes } from './socket-types';
 
 export interface DirectionPayload {
     direction: Direction;
@@ -32,6 +24,7 @@ export class GameGateway implements OnGatewayConnection {
         private readonly gameService: GameService,
         private readonly usersService: UsersService,
         private readonly logService: GameLogService,
+        private readonly mazeCellService: MazeCellService,
     ) {}
 
     async handleConnection(client: any, ...args: any[]) {
@@ -40,21 +33,24 @@ export class GameGateway implements OnGatewayConnection {
 
         const userName = args[0]?.userName;
         if (!userName) {
-            client.emit('error', { code: SocketErrorCodes.USERNAME_REQUIRED, message: 'Username is required' });
+            client.emit(SocketEvents.ERROR, {
+                code: SocketErrorCodes.USERNAME_REQUIRED,
+                message: 'Username is required',
+            });
             client.disconnect();
             return;
         }
 
         const user = await this.usersService.createUserIfNotExists({ userName: userName });
         if (!user) {
-            client.emit('error', {
+            client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.USERNAME_TAKEN,
                 message: 'Username is already taken or another error occurred.',
             });
             client.disconnect();
             return;
         } else {
-            client.emit('success', {
+            client.emit(SocketEvents.SUCCESS, {
                 code: SocketSuccessCodes.USER_CREATED,
                 message: 'User successfully created.',
                 payload: {
@@ -65,16 +61,23 @@ export class GameGateway implements OnGatewayConnection {
 
         const availableGames = await this.gameService.getAvailableGames();
         if (availableGames && availableGames.length) {
-            client.emit('availableGames', availableGames);
+            client.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
         } else {
-            client.emit('availableGames', []);
+            client.emit(SocketEvents.AVAILABLE_GAMES, []);
         }
     }
 
     @SubscribeMessage('createGame')
     async handleCreateGame(client: any, payload: any): Promise<any> {
-        const newGame = await this.gameService.createGame(payload); // Ваш метод для створення нової гри
-        client.emit('gameCreated', newGame);
+        const newGame = await this.gameService.createGame(payload);
+        const newMaze = await this.mazeCellService.createRandomMaze(newGame.id);
+        if (!newGame || newMaze) {
+            client.emit(SocketEvents.ERROR, {
+                code: SocketErrorCodes.GAME_NOT_CREATED,
+                message: 'Error occurred while creating game',
+            });
+        }
+        client.emit(SocketEvents.GAME_CREATED, { game: newGame, maze: newMaze });
     }
 
     @SubscribeMessage('direction')
@@ -84,7 +87,7 @@ export class GameGateway implements OnGatewayConnection {
 
         if (!startPosition) {
             // console.log('Players are not found on maze');
-            client.emit('error', {
+            client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.PLAYER_IS_NOT_FOUND,
                 message: 'Players are not found on maze.',
             });
@@ -103,7 +106,7 @@ export class GameGateway implements OnGatewayConnection {
 
         // saveLogs(currentPlayer, playerId, direction, newX, newY);
 
-        client.emit('success', {
+        client.emit(SocketEvents.SUCCESS, {
             code: SocketSuccessCodes.USER_CREATED,
             message: 'User successfully created.',
             payload: {
@@ -117,20 +120,23 @@ export class GameGateway implements OnGatewayConnection {
         const { userName } = payload;
 
         if (!userName) {
-            client.emit('error', { code: SocketErrorCodes.USERNAME_REQUIRED, message: 'Username is required' });
+            client.emit(SocketEvents.ERROR, {
+                code: SocketErrorCodes.USERNAME_REQUIRED,
+                message: 'Username is required',
+            });
             return;
         }
 
         const user = await this.usersService.createUserIfNotExists({ userName: userName });
         if (!user) {
-            client.emit('error', {
+            client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.USERNAME_TAKEN,
                 message: 'Username is already taken or another error occurred.',
             });
             return;
         }
 
-        client.emit('success', {
+        client.emit(SocketEvents.SUCCESS, {
             code: SocketSuccessCodes.USER_CREATED,
             message: 'User successfully created.',
             payload: {
