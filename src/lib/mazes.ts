@@ -1,12 +1,10 @@
+import { Direction } from '../cell/cell.model';
+import { PlayerType } from '../players/player.model';
+
 export enum Cell {
     WALL = 1,
     PATH = 0,
     EXIT = -1,
-}
-
-export enum PlayerType {
-    PLAYER1 = 1,
-    PLAYER2 = 2,
 }
 
 export type MazeCell = {
@@ -15,13 +13,6 @@ export type MazeCell = {
     direction?: Direction;
     player?: PlayerType;
 };
-
-export enum Direction {
-    UP = '/up',
-    DOWN = '/down',
-    LEFT = '/left',
-    RIGHT = '/right',
-}
 
 const wall: MazeCell = {
     type: Cell.WALL,

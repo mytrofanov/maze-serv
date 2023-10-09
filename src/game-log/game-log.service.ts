@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { GameLog, PlayerType, Direction } from './game-log.model';
+import { GameLog } from './game-log.model';
 import { Game } from '../game/game.model';
+import { PlayerType } from '../players/player.model';
+import { Direction } from '../cell/cell.model';
 
 @Injectable()
 export class GameLogService {
@@ -19,7 +21,7 @@ export class GameLogService {
         direction?: Direction,
         newX?: number,
         newY?: number,
-        message?: string
+        message?: string,
     ): Promise<GameLog> {
         const created = new Date().toLocaleTimeString();
         const logMessage = message
@@ -33,7 +35,7 @@ export class GameLogService {
             position: newX && newY ? { x: newX, y: newY } : null,
             message: logMessage,
             created,
-            gameId,  // Important add game ID
+            gameId,
         };
 
         return this.gameLogModel.create(log);

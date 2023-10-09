@@ -1,4 +1,4 @@
-import { Direction, Position } from '../game-log/game-log.model';
+import { Direction, Position } from '../cell/cell.model';
 
 export const newPosition = (direction: Direction, startPosition: Position) => {
     let newX = startPosition.x;

@@ -6,14 +6,14 @@ import { Direction } from '../lib/mazes';
 import { newPosition } from '../utils';
 import { GameLogService } from '../game-log/game-log.service';
 import { MazeCellService } from '../cell/cell.service';
-import { SocketErrorCodes, SocketEvents, SocketSuccessCodes } from './socket-types';
-
-export interface DirectionPayload {
-    direction: Direction;
-    gameId: number;
-    playerId: number;
-    message?: string;
-}
+import {
+    ConnectToGamePayload,
+    CreateGamePayload,
+    DirectionPayload,
+    SocketErrorCodes,
+    SocketEvents,
+    SocketSuccessCodes,
+} from './socket-types';
 
 @WebSocketGateway() // can choose port @WebSocketGateway(4001), for example
 export class GameGateway implements OnGatewayConnection {
@@ -67,8 +67,8 @@ export class GameGateway implements OnGatewayConnection {
         }
     }
 
-    @SubscribeMessage('createGame')
-    async handleCreateGame(client: any, payload: any): Promise<any> {
+    @SubscribeMessage(SocketEvents.CREATE_GAME)
+    async handleCreateGame(client: any, payload: CreateGamePayload): Promise<any> {
         const newGame = await this.gameService.createGame(payload);
         const newMaze = await this.mazeCellService.createRandomMaze(newGame.id);
         if (!newGame || newMaze) {
@@ -80,31 +80,42 @@ export class GameGateway implements OnGatewayConnection {
         client.emit(SocketEvents.GAME_CREATED, { game: newGame, maze: newMaze });
     }
 
-    @SubscribeMessage('direction')
-    async handleDirectionChange(client: any, payload: DirectionPayload): Promise<any> {
-        const { direction, gameId, playerId, message } = payload;
-        const startPosition = await this.gameService.findPlayerPosition(gameId);
-
-        if (!startPosition) {
-            // console.log('Players are not found on maze');
+    @SubscribeMessage(SocketEvents.CONNECT_GAME)
+    async handleConnectGame(client: any, payload: ConnectToGamePayload): Promise<any> {
+        const connectedGame = await this.gameService.connectToGame(payload);
+        const maze = await this.mazeCellService.getMazeById(connectedGame.id);
+        if (!connectedGame || !maze) {
             client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.PLAYER_IS_NOT_FOUND,
-                message: 'Players are not found on maze.',
+                code: SocketErrorCodes.ERROR_ON_CONNECT_TO_GAME,
+                message: 'Error occurred while connecting to game',
             });
         }
-        const updatedPosition = newPosition(direction, startPosition.playerPosition);
+        client.emit(SocketEvents.GAME_CONNECTED, { game: connectedGame, maze: maze });
+    }
+
+    @SubscribeMessage(SocketEvents.DIRECTION)
+    async handleDirectionChange(client: any, payload: DirectionPayload): Promise<any> {
+        const { direction, gameId, playerId, playerType, message } = payload;
+        const startPosition = await this.mazeCellService.findPlayerPosition(gameId, playerType);
+
+        if (!startPosition) {
+            client.emit(SocketEvents.ERROR, {
+                code: SocketErrorCodes.PLAYER_IS_NOT_FOUND,
+                message: 'Player is not found on the maze',
+            });
+        }
+
+        const updatedPosition = newPosition(direction, startPosition);
 
         await this.logService.createLog(
             gameId,
-            startPosition.currentPlayer,
+            playerType,
             playerId,
             direction,
             updatedPosition.x,
             updatedPosition.y,
             message,
         );
-
-        // saveLogs(currentPlayer, playerId, direction, newX, newY);
 
         client.emit(SocketEvents.SUCCESS, {
             code: SocketSuccessCodes.USER_CREATED,
@@ -115,7 +126,7 @@ export class GameGateway implements OnGatewayConnection {
         });
     }
 
-    @SubscribeMessage('createUser')
+    @SubscribeMessage(SocketEvents.CREATE_USER)
     async handleCreateUser(client: any, payload: { userName: string }): Promise<any> {
         const { userName } = payload;
 

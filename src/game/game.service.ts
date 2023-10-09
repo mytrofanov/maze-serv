@@ -1,8 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Game, GameStatus } from './game.model';
 import { PlayerType } from '../players/player.model';
 import { MazeCellService } from '../cell/cell.service';
+import { UsersService } from '../users/users.service';
+import { ConnectToGamePayload } from './socket-types';
 
 @Injectable()
 export class GameService {
@@ -10,6 +12,7 @@ export class GameService {
         @InjectModel(Game)
         private readonly gameModel: typeof Game,
         private readonly mazeCellService: MazeCellService,
+        private readonly usersService: UsersService,
     ) {}
 
     async createGame(payload: any): Promise<Game> {
@@ -61,5 +64,27 @@ export class GameService {
         await game.save();
 
         return game;
+    }
+
+    async connectToGame(payload: ConnectToGamePayload): Promise<Game> {
+        const { gameId, userId } = payload;
+        const game = await this.gameModel.findByPk(gameId);
+        const user = await this.usersService.getUserById(userId.toString());
+
+        if (!game) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
+        }
+        if (!user) {
+            throw new NotFoundException(`User with ID ${userId} not found`);
+        }
+
+        if (game.status !== GameStatus.WAITING_FOR_PLAYER) {
+            throw new ConflictException('The game is either already in progress or completed');
+        }
+
+        game.player2Id = user.id;
+        game.status = GameStatus.IN_PROGRESS;
+
+        return game.save();
     }
 }

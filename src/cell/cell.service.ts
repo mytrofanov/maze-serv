@@ -92,4 +92,7 @@ export class MazeCellService {
 
         return cell.position;
     }
+    async handleDirectionChange () =>{
+
+}
 }

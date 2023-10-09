@@ -1,19 +1,7 @@
-import {Table, Column, Model, DataType, ForeignKey, BelongsTo} from 'sequelize-typescript';
-import {Player} from "../players/player.model";
-import {Game} from "../game/game.model";
-
-export enum PlayerType {
-    PLAYER1 = 1,
-    PLAYER2 = 2,
-}
-export enum Direction {
-    UP = '/up',
-    DOWN = '/down',
-    LEFT = '/left',
-    RIGHT = '/right',
-}
-
-export type Position = { x: number; y: number };
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Player, PlayerType } from '../players/player.model';
+import { Game } from '../game/game.model';
+import { Direction, Position } from '../cell/cell.model';
 
 @Table({ tableName: 'GameLog', timestamps: true })
 export class GameLog extends Model {
