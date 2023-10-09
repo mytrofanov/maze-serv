@@ -55,7 +55,7 @@ export class MazeCellService {
         return this.mazeCellModel.bulkCreate(cellsData);
     }
 
-    async returnMaze(gameId: number): Promise<MazeCell[][]> {
+    async getMazeById(gameId: number): Promise<MazeCell[][]> {
         const cells = await this.mazeCellModel.findAll({
             where: { gameId: gameId },
             order: [['position', 'ASC']],
@@ -66,7 +66,7 @@ export class MazeCellService {
         }
 
         const maze: MazeCell[][] = [];
-
+        //find group method to avoid this:
         cells.forEach(cell => {
             const position = cell.position;
             if (!maze[position.y]) {

@@ -1,6 +1,6 @@
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { Maze } from '../maze/maze.model';
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import { Player, PlayerType } from '../players/player.model';
+import { MazeCell } from '../cell/cell.model';
 
 export enum GameStatus {
     WAITING_FOR_PLAYER = 'WAITING_FOR_PLAYER',
@@ -13,13 +13,6 @@ export enum GameStatus {
 export class Game extends Model {
     @Column({ type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
     id: number;
-
-    @ForeignKey(() => Maze)
-    @Column
-    mazeId: number;
-
-    @BelongsTo(() => Maze)
-    maze: Maze;
 
     @ForeignKey(() => Player)
     @Column({ type: DataType.INTEGER, allowNull: false })
@@ -52,4 +45,7 @@ export class Game extends Model {
 
     @Column(DataType.ENUM(...Object.values(GameStatus)))
     status: GameStatus;
+
+    @HasMany(() => MazeCell)
+    cells: MazeCell[];
 }
