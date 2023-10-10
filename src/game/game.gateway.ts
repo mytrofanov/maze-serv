@@ -93,7 +93,7 @@ export class GameGateway implements OnGatewayConnection {
                 message: 'Error occurred while connecting to game',
             });
         }
-        client.emit(SocketEvents.GAME_CONNECTED, { game: connectedGame, maze: maze });
+        this.server.emit(SocketEvents.GAME_UPDATED, { game: connectedGame, maze: maze });
     }
 
     @SubscribeMessage(SocketEvents.DIRECTION)

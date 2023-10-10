@@ -17,24 +17,11 @@ export class MazeCellService {
 
     async updateCell(cellId: number, changes: Partial<MazeCell>): Promise<MazeCell> {
         const cell = await this.mazeCellModel.findByPk(cellId);
-
         if (!cell) {
             throw new NotFoundException(`Cell with ID ${cellId} not found`);
         }
 
         return cell.update(changes);
-    }
-
-    async setPlayer(cellId: number, player: PlayerType): Promise<MazeCell> {
-        return this.updateCell(cellId, { player });
-    }
-
-    async setDirection(cellId: number, direction: Direction): Promise<MazeCell> {
-        return this.updateCell(cellId, { direction });
-    }
-
-    async revealCell(cellId: number): Promise<MazeCell> {
-        return this.updateCell(cellId, { revealed: true });
     }
 
     async createRandomMaze(gameId: number): Promise<any> {
@@ -84,7 +71,6 @@ export class MazeCellService {
         updatedPosition: Position,
         currentPlayer: PlayerType,
     ) {
-        console.log('handleDirectionChange: ', updatedPosition);
         const prevCell = await this.mazeCellModel.findOne({
             where: {
                 colX: startPosition.x,

@@ -7,7 +7,10 @@ export enum GameStatus {
     WAITING_FOR_PLAYER = 'WAITING_FOR_PLAYER',
     IN_PROGRESS = 'IN_PROGRESS',
     COMPLETED = 'COMPLETED',
-    CONNECTION_ERROR = 'connection_error',
+    CONNECTION_ERROR = 'CONNECTION_ERROR',
+    CONNECTING = 'CONNECTING',
+    CONNECTED = 'CONNECTED',
+    WELCOME_SCREEN = 'WELCOME_SCREEN',
 }
 
 @Table({ tableName: 'game' })
