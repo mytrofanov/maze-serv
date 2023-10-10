@@ -20,21 +20,21 @@ export class GameLogService {
         newY?: number,
         message?: string,
     ): Promise<GameLog> {
-        const created = new Date().toLocaleTimeString();
         const logMessage = message
-            ? `${PlayerType[currentPlayer]} message: ${message} at ${created}`
-            : `${PlayerType[currentPlayer]} going ${direction} at ${created}`;
-
+            ? `${PlayerType[currentPlayer]} message: ${message} at`
+            : `${PlayerType[currentPlayer]} going ${direction} at`;
+        console.log('createLog newX: ', newX);
+        console.log('createLog newY: ', newY);
         const log = {
             playerType: currentPlayer,
             playerId: playerId,
             direction: direction || null,
-            position: newX && newY ? { x: newX, y: newY } : null,
+            rowY: newY ? newY : null,
+            colX: newX ? newX : null,
             message: logMessage,
-            created,
             gameId,
         };
-
+        console.log('log: ', log);
         return this.gameLogModel.create(log);
     }
 
@@ -43,7 +43,7 @@ export class GameLogService {
             where: {
                 gameId: gameId,
             },
-            order: [['created', 'DESC']],
+            order: [['createdAt', 'DESC']],
         });
     }
 }

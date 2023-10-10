@@ -84,15 +84,18 @@ export class MazeCellService {
         updatedPosition: Position,
         currentPlayer: PlayerType,
     ) {
+        console.log('handleDirectionChange: ', updatedPosition);
         const prevCell = await this.mazeCellModel.findOne({
             where: {
-                position: startPosition,
+                colX: startPosition.x,
+                rowY: startPosition.y,
                 gameId: gameId,
             },
         });
         const newCell = await this.mazeCellModel.findOne({
             where: {
-                position: updatedPosition,
+                colX: updatedPosition.x,
+                rowY: updatedPosition.y,
                 gameId: gameId,
             },
         });

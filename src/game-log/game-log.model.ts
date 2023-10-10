@@ -1,6 +1,6 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { Game } from '../game/game.model';
-import { Direction, Position } from '../cell/cell.model';
+import { Direction } from '../cell/cell.model';
 import { PlayerType, User } from '../users/users.model';
 
 @Table({ tableName: 'GameLog', timestamps: true })
@@ -24,8 +24,11 @@ export class GameLog extends Model {
     @Column({ type: DataType.STRING })
     message: string;
 
-    @Column({ type: DataType.JSON, allowNull: true })
-    position: Position | null;
+    @Column({ type: DataType.INTEGER })
+    rowY: number;
+
+    @Column({ type: DataType.INTEGER })
+    colX: number;
 
     @ForeignKey(() => Game)
     @Column
@@ -33,7 +36,4 @@ export class GameLog extends Model {
 
     @BelongsTo(() => Game)
     game: Game;
-
-    @Column({ type: DataType.DATE })
-    created: Date;
 }

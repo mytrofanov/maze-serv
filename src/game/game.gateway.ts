@@ -37,15 +37,11 @@ export class GameGateway implements OnGatewayConnection {
         const connectionPayload = client.handshake.query;
         const { userName, userId } = connectionPayload;
 
-        console.log('Username:', userName);
-
         if (!userName) {
             client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.USERNAME_REQUIRED,
                 message: 'Username is required',
             });
-            client.disconnect();
-            return;
         }
 
         const user = await this.usersService.createUserIfNotExists({ userName: userName, userId: userId });
@@ -54,8 +50,6 @@ export class GameGateway implements OnGatewayConnection {
                 code: SocketErrorCodes.USERNAME_TAKEN,
                 message: 'Username is already taken or another error occurred.',
             });
-            client.disconnect();
-            return;
         } else {
             client.emit(SocketEvents.SUCCESS, {
                 code: SocketSuccessCodes.USER_CREATED,
@@ -79,7 +73,6 @@ export class GameGateway implements OnGatewayConnection {
         console.log('handleCreateGame: ', payload);
         const newGame = await this.gameService.createGame(payload);
         const newMaze = await this.mazeCellService.createRandomMaze(newGame.id);
-        //const newMaze = await this.mazeCellService.getMazeById(newGame.id);
 
         if (!newGame || !newMaze) {
             client.emit(SocketEvents.ERROR, {
@@ -105,9 +98,10 @@ export class GameGateway implements OnGatewayConnection {
 
     @SubscribeMessage(SocketEvents.DIRECTION)
     async handleDirectionChange(client: any, payload: DirectionPayload): Promise<any> {
+        console.log('handleDirectionChange: ', payload);
         const { direction, gameId, playerId, playerType, message } = payload;
         const startPosition = await this.mazeCellService.findPlayerPosition(gameId, playerType);
-
+        console.log('startPosition', startPosition);
         if (!startPosition) {
             client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.PLAYER_IS_NOT_FOUND,
@@ -116,7 +110,7 @@ export class GameGateway implements OnGatewayConnection {
         }
 
         const updatedPosition = newPosition(direction, startPosition);
-
+        console.log('updatedPosition', updatedPosition);
         await this.logService.createLog(
             gameId,
             playerType,
