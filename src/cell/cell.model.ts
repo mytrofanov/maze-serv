@@ -41,8 +41,14 @@ export class MazeCell extends Model {
     @BelongsTo(() => Game)
     game: Game;
 
-    @Column({ type: DataType.JSON })
-    position: Position;
+    // @Column({ type: DataType.JSON })
+    // position: Position;
+
+    @Column({ type: DataType.INTEGER })
+    rowY: number;
+
+    @Column({ type: DataType.INTEGER })
+    colX: number;
 
     @Column({ type: DataType.INTEGER })
     type: number;

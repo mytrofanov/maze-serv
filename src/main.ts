@@ -16,9 +16,9 @@ async function bootstrap() {
         }),
     );
 
-    //for db changes:
-    // const sequelize = app.get(Sequelize);
-    // await sequelize.sync({ force: true });
+    //for db structure changes:
+    const sequelize = app.get(Sequelize);
+    await sequelize.sync({ force: true });
 
     await app.listen(PORT, () => {
         console.log('Server started on port:', PORT);

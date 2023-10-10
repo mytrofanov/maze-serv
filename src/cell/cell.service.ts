@@ -4,6 +4,7 @@ import { Cell, Direction, MazeCell, Position } from './cell.model';
 import { Mazes } from '../lib/mazes';
 import { GameService } from '../game/game.service';
 import { PlayerType } from '../users/users.model';
+import { flattenMaze, MazeArrCell, unflattenMaze } from '../utils';
 
 @Injectable()
 export class MazeCellService {
@@ -13,10 +14,6 @@ export class MazeCellService {
         @Inject(forwardRef(() => GameService))
         private readonly gameService: GameService,
     ) {}
-
-    // async createCell(data: { gameId: number; position: Position; type: Cell }): Promise<MazeCell> {
-    //     return this.mazeCellModel.create(data);
-    // }
 
     async updateCell(cellId: number, changes: Partial<MazeCell>): Promise<MazeCell> {
         const cell = await this.mazeCellModel.findByPk(cellId);
@@ -40,45 +37,30 @@ export class MazeCellService {
         return this.updateCell(cellId, { revealed: true });
     }
 
-    async createRandomMaze(gameId: number): Promise<MazeCell[]> {
+    async createRandomMaze(gameId: number): Promise<any> {
         const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
 
         if (!randomMazeData) {
             throw new NotFoundException('Maze not found');
         }
 
-        const cellsData = randomMazeData.flatMap((rowY, indexY) => {
-            return rowY.map((colX, indexX) => ({
-                position: JSON.stringify({ y: indexY, x: indexX }),
-                gameId: gameId,
-                ...colX,
-            }));
-        });
+        const cellsData = flattenMaze(randomMazeData, gameId);
 
-        return this.mazeCellModel.bulkCreate(cellsData);
+        await this.mazeCellModel.bulkCreate(cellsData);
+        return randomMazeData;
     }
 
-    async getMazeById(gameId: number): Promise<MazeCell[][]> {
+    async getMazeById(gameId: number): Promise<MazeArrCell[][]> {
         const cells = await this.mazeCellModel.findAll({
             where: { gameId: gameId },
-            // order: [['position', 'ASC']],
+            order: [['rowY', 'ASC']],
         });
 
         if (!cells.length) {
             throw new NotFoundException('No cells found for the provided gameId.');
         }
 
-        const maze: MazeCell[][] = [];
-        //find group method to avoid this:
-        cells.forEach(cell => {
-            const position = cell.position;
-            if (!maze[position.y]) {
-                maze[position.y] = [];
-            }
-            maze[position.y][position.x] = cell;
-        });
-
-        return maze;
+        return unflattenMaze(cells);
     }
 
     async findPlayerPosition(gameId: number, player: PlayerType): Promise<Position | null> {
@@ -92,8 +74,8 @@ export class MazeCellService {
         if (!cell) {
             throw new NotFoundException(`Cell with player ${player} not found in the game with ID ${gameId}`);
         }
-
-        return cell.position;
+        const position = { x: cell.colX, y: cell.rowY };
+        return position;
     }
     async handleDirectionChange(
         gameId: number,

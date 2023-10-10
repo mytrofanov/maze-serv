@@ -12,6 +12,8 @@ export type MazeCell = {
     revealed: boolean;
     direction?: Direction;
     player?: PlayerType;
+    rowY?: number;
+    colX?: number;
 };
 
 const wall: MazeCell = {
