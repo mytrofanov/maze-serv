@@ -3,12 +3,15 @@ import { InjectModel } from '@nestjs/sequelize';
 import { GameLog } from './game-log.model';
 import { Direction } from '../cell/cell.model';
 import { PlayerType } from '../users/users.model';
+import { UsersService } from '../users/users.service';
+import { checkForNullUndefined } from '../utils';
 
 @Injectable()
 export class GameLogService {
     constructor(
         @InjectModel(GameLog)
         private readonly gameLogModel: typeof GameLog,
+        private readonly usersService: UsersService,
     ) {}
 
     async createLog(
@@ -20,9 +23,11 @@ export class GameLogService {
         newY?: number,
         message?: string,
     ): Promise<GameLog> {
-        const logMessage = message
-            ? `${PlayerType[currentPlayer]} message: ${message} at`
-            : `${PlayerType[currentPlayer]} going ${direction} at`;
+        const user = await this.usersService.getUserById(playerId);
+        console.log('createLog message: ', message);
+        const logMessage = checkForNullUndefined(message)
+            ? `${user.userName} sending message: ${message}`
+            : `${user.userName} going ${direction}`;
         console.log('createLog newX: ', newX);
         console.log('createLog newY: ', newY);
         const log = {
@@ -43,7 +48,7 @@ export class GameLogService {
             where: {
                 gameId: gameId,
             },
-            order: [['createdAt', 'DESC']],
+            order: [['id', 'DESC']],
         });
     }
 }

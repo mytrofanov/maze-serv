@@ -46,9 +46,7 @@ export class GameService {
     }
 
     async findGame(gameId: number): Promise<Game> {
-        const game = await this.gameModel.findByPk(gameId, {
-            include: [GameLog],
-        });
+        const game = await this.gameModel.findByPk(gameId);
 
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);
@@ -80,7 +78,7 @@ export class GameService {
     async connectToGame(payload: ConnectToGamePayload): Promise<Game> {
         const { gameId, userId } = payload;
         const game = await this.gameModel.findByPk(gameId);
-        const user = await this.usersService.getUserById(userId.toString());
+        const user = await this.usersService.getUserById(userId);
 
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);

@@ -8,5 +8,5 @@ export class CreateUserDto {
 export class CheckUserDto {
     @IsString({ message: 'must be a string' })
     readonly userName: string;
-    readonly userId?: string;
+    readonly userId?: number;
 }

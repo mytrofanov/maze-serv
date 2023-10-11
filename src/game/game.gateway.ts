@@ -82,7 +82,7 @@ export class GameGateway implements OnGatewayConnection {
                 message: 'Error occurred while creating game',
             });
         }
-        client.emit(SocketEvents.GAME_CREATED, { game: newGame, maze: newMaze });
+        this.server.emit(SocketEvents.GAME_CREATED, { game: newGame, maze: newMaze });
     }
 
     @SubscribeMessage(SocketEvents.CONNECT_GAME)
@@ -91,7 +91,7 @@ export class GameGateway implements OnGatewayConnection {
         const maze = await this.mazeCellService.getMazeById(connectedGame.id);
         if (!connectedGame || !maze) {
             client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.ERROR_ON_CONNECT_TO_GAME,
+                code: SocketErrorCodes.NETWORK_ERROR,
                 message: 'Error occurred while connecting to game',
             });
         }
@@ -127,8 +127,10 @@ export class GameGateway implements OnGatewayConnection {
 
         const updatedGameState = await this.gameService.togglePlayer(gameId);
         const updatedMaze = await this.mazeCellService.getMazeById(gameId);
+        const allLogs = await this.logService.getGameLogs(gameId);
 
-        client.emit(SocketEvents.GAME_UPDATED, { game: updatedGameState, maze: updatedMaze });
+        this.server.emit(SocketEvents.LOG_UPDATED, allLogs);
+        this.server.emit(SocketEvents.GAME_UPDATED, { game: updatedGameState, maze: updatedMaze });
     }
 
     @SubscribeMessage(SocketEvents.SEND_MESSAGE)
@@ -139,7 +141,7 @@ export class GameGateway implements OnGatewayConnection {
 
         const allLogs = await this.logService.getGameLogs(gameId);
 
-        client.emit(SocketEvents.LOG_UPDATED, allLogs);
+        this.server.emit(SocketEvents.LOG_UPDATED, allLogs);
     }
 
     @SubscribeMessage(SocketEvents.CREATE_USER)
