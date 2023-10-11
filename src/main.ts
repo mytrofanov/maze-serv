@@ -20,7 +20,7 @@ async function bootstrap() {
     const sequelize = app.get(Sequelize);
     await sequelize.sync({ force: true });
 
-    await app.listen(PORT, () => {
+    await app.listen(PORT, '0.0.0.0', () => {
         console.log('Server started on port:', PORT);
     });
 }

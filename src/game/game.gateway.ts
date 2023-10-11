@@ -15,6 +15,8 @@ import {
     SocketSuccessCodes,
 } from './socket-types';
 
+const localHost = 'http://localhost:5173';
+
 @WebSocketGateway({
     cors: {
         origin: 'http://localhost:5173',
