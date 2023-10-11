@@ -64,9 +64,9 @@ export class GameGateway implements OnGatewayConnection {
 
         const availableGames = await this.gameService.getAvailableGames();
         if (availableGames && availableGames.length) {
-            client.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
+            this.server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
         } else {
-            client.emit(SocketEvents.AVAILABLE_GAMES, []);
+            this.server.emit(SocketEvents.AVAILABLE_GAMES, []);
         }
     }
 
@@ -82,7 +82,13 @@ export class GameGateway implements OnGatewayConnection {
                 message: 'Error occurred while creating game',
             });
         }
-        this.server.emit(SocketEvents.GAME_CREATED, { game: newGame, maze: newMaze });
+        client.emit(SocketEvents.GAME_CREATED, { game: newGame, maze: newMaze });
+        const availableGames = await this.gameService.getAvailableGames();
+        if (availableGames && availableGames.length) {
+            this.server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
+        } else {
+            this.server.emit(SocketEvents.AVAILABLE_GAMES, []);
+        }
     }
 
     @SubscribeMessage(SocketEvents.CONNECT_GAME)

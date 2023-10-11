@@ -42,6 +42,7 @@ export class GameService {
                     attributes: ['userName'],
                 },
             ],
+            order: [['id', 'DESC']],
         });
     }
 
