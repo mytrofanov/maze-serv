@@ -1,11 +1,11 @@
-import { Direction } from '../cell/cell.model';
+import { Cell, Direction } from '../cell/cell.model';
 import { PlayerType } from '../users/users.model';
 
-export enum Cell {
-    WALL = 1,
-    PATH = 0,
-    EXIT = -1,
-}
+// export enum Cell {
+//     WALL = 1,
+//     PATH = 0,
+//     EXIT = -1,
+// }
 
 export type MazeCell = {
     type: Cell;

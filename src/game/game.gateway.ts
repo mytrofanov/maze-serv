@@ -150,7 +150,7 @@ export class GameGateway implements OnGatewayConnection {
             });
         }
 
-        const updatedPosition = newPosition(direction, startPosition);
+        const updatedPosition = newPosition(direction, { x: startPosition.colX, y: startPosition.rowY });
         console.log('updatedPosition', updatedPosition);
         await this.logService.createLog(
             gameId,

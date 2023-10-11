@@ -24,12 +24,9 @@ export class GameLogService {
         message?: string,
     ): Promise<GameLog> {
         const user = await this.usersService.getUserById(playerId);
-        console.log('createLog message: ', message);
         const logMessage = checkForNullUndefined(message)
             ? `${user.userName} sending message: ${message}`
             : `${user.userName} going ${direction}`;
-        console.log('createLog newX: ', newX);
-        console.log('createLog newY: ', newY);
         const log = {
             playerType: currentPlayer,
             playerId: playerId,
@@ -39,7 +36,7 @@ export class GameLogService {
             message: logMessage,
             gameId,
         };
-        console.log('log: ', log);
+
         return this.gameLogModel.create(log);
     }
 

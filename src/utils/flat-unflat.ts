@@ -2,7 +2,7 @@ import { Cell, Direction } from '../cell/cell.model';
 import { PlayerType } from '../users/users.model';
 
 export type MazeArrCell = {
-    type: Cell;
+    type: string | Cell;
     revealed: boolean;
     direction?: Direction;
     player?: PlayerType;

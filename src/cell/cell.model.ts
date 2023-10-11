@@ -3,9 +3,9 @@ import { Game } from '../game/game.model';
 import { PlayerType } from '../users/users.model';
 
 export enum Cell {
-    WALL = 1,
-    PATH = 0,
-    EXIT = -1,
+    WALL = 'WALL',
+    PATH = 'PATH',
+    EXIT = 'EXIT',
 }
 
 export enum Direction {
@@ -20,14 +20,14 @@ export type Position = {
     y: number;
 };
 
-export type MazeCellType = {
-    gameId: number;
-    position: Position;
-    type: Cell;
-    revealed: boolean;
-    direction?: Direction;
-    player?: PlayerType;
-};
+// export type MazeCellType = {
+//     gameId: number;
+//     position: Position;
+//     type: Cell;
+//     revealed: boolean;
+//     direction?: Direction;
+//     player?: PlayerType;
+// };
 
 @Table({ tableName: 'MazeCell', timestamps: true })
 export class MazeCell extends Model {
@@ -47,8 +47,8 @@ export class MazeCell extends Model {
     @Column({ type: DataType.INTEGER })
     colX: number;
 
-    @Column({ type: DataType.INTEGER })
-    type: number;
+    @Column({ type: DataType.STRING, values: Object.values(Cell) })
+    type: string;
 
     @Column({ type: DataType.BOOLEAN })
     revealed: boolean;

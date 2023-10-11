@@ -24,19 +24,6 @@ export class MazeCellService {
         return cell.update(changes);
     }
 
-    async createRandomMaze(gameId: number): Promise<any> {
-        const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
-
-        if (!randomMazeData) {
-            throw new NotFoundException('Maze not found');
-        }
-
-        const cellsData = flattenMaze(randomMazeData, gameId);
-
-        await this.mazeCellModel.bulkCreate(cellsData);
-        return randomMazeData;
-    }
-
     async getMazeById(gameId: number): Promise<MazeArrCell[][]> {
         const cells = await this.mazeCellModel.findAll({
             where: { gameId: gameId },
@@ -50,7 +37,20 @@ export class MazeCellService {
         return unflattenMaze(cells);
     }
 
-    async findPlayerPosition(gameId: number, player: PlayerType): Promise<Position | null> {
+    async createRandomMaze(gameId: number): Promise<any> {
+        const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
+
+        if (!randomMazeData) {
+            throw new NotFoundException('Maze not found');
+        }
+
+        const cellsData = flattenMaze(randomMazeData, gameId);
+
+        await this.mazeCellModel.bulkCreate(cellsData);
+        return this.getMazeById(gameId);
+    }
+
+    async findPlayerPosition(gameId: number, player: PlayerType): Promise<MazeCell | null> {
         const cell = await this.mazeCellModel.findOne({
             where: {
                 gameId: gameId,
@@ -61,31 +61,25 @@ export class MazeCellService {
         if (!cell) {
             throw new NotFoundException(`Cell with player ${player} not found in the game with ID ${gameId}`);
         }
-        const position = { x: cell.colX, y: cell.rowY };
-        return position;
+        // const position = { x: cell.colX, y: cell.rowY };
+        return cell;
     }
     async handleDirectionChange(
         gameId: number,
         direction: Direction,
-        startPosition: Position,
+        startPosition: MazeCell,
         updatedPosition: Position,
         currentPlayer: PlayerType,
     ) {
-        const prevCell = await this.mazeCellModel.findOne({
-            where: {
-                colX: startPosition.x,
-                rowY: startPosition.y,
-                gameId: gameId,
-            },
-        });
+        const prevCell = await this.mazeCellModel.findByPk(startPosition.id);
         const newCell = await this.mazeCellModel.findOne({
             where: {
+                gameId: gameId,
                 colX: updatedPosition.x,
                 rowY: updatedPosition.y,
-                gameId: gameId,
             },
         });
-
+        console.log('found newCell:', newCell);
         if (!newCell || !prevCell) {
             throw new NotFoundException(
                 `Cell with position ${updatedPosition} or ${startPosition} not found in the game with ID ${gameId}`,
@@ -100,20 +94,31 @@ export class MazeCellService {
                 );
             }
             //move player to new cell
-            await this.updateCell(newCell.id, {
-                revealed: true,
-                player: currentPlayer,
-            });
+            newCell.revealed = true;
+            newCell.player = currentPlayer;
+            await newCell.save();
+            console.log('newCell: ', newCell);
+            // await this.updateCell(newCell.id, {
+            //     revealed: true,
+            //     player: currentPlayer,
+            // });
             //clear prev cell
-            await this.updateCell(prevCell.id, {
-                revealed: true,
-                player: undefined,
-                direction: direction,
-            });
+            prevCell.revealed = true;
+            prevCell.player = undefined;
+            prevCell.direction = direction;
+            await prevCell.save();
+            console.log('prevCell: ', prevCell);
+            // await this.updateCell(prevCell.id, {
+            //     revealed: true,
+            //     player: undefined,
+            //     direction: direction,
+            // });
         }
         //if wall
-        await this.updateCell(newCell.id, {
-            revealed: true,
-        });
+        newCell.revealed = true;
+        await newCell.save();
+        // await this.updateCell(newCell.id, {
+        //     revealed: true,
+        // });
     }
 }
