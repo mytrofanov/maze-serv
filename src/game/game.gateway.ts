@@ -1,4 +1,4 @@
-import { SubscribeMessage, WebSocketGateway, OnGatewayConnection, WebSocketServer } from '@nestjs/websockets';
+import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
@@ -14,6 +14,7 @@ import {
     SocketEvents,
     SocketSuccessCodes,
 } from './socket-types';
+import { PlayerType } from '../users/users.model';
 
 const localHost = 'http://localhost:5173';
 
@@ -108,7 +109,39 @@ export class GameGateway implements OnGatewayConnection {
     async handleDirectionChange(client: any, payload: DirectionPayload): Promise<any> {
         console.log('handleDirectionChange: ', payload);
         const { direction, gameId, playerId, playerType, message } = payload;
-        const startPosition = await this.mazeCellService.findPlayerPosition(gameId, playerType);
+        const game = await this.gameService.findGame(gameId);
+        if (!game) {
+            client.emit(SocketEvents.ERROR, {
+                code: SocketErrorCodes.GAME_NOT_FOUND,
+                message: `Game with id ${gameId} not found`,
+            });
+        }
+        if (game.currentPlayer === PlayerType.PLAYER1 && playerId !== game.player1Id) {
+            console.log(
+                'game.currentPlayer:',
+                game.currentPlayer,
+                'playerId: ',
+                playerId,
+                'game.player1Id: ',
+                game.player1Id,
+            );
+            console.log('Player2 cant make move, Player1 should make move');
+            return;
+        }
+        if (game.currentPlayer === PlayerType.PLAYER2 && playerId !== game.player2Id) {
+            console.log(
+                'game.currentPlayer:',
+                game.currentPlayer,
+                'playerId: ',
+                playerId,
+                'game.player2Id: ',
+                game.player2Id,
+            );
+            console.log('Player1 cant make move, Player2 should make move');
+            return;
+        }
+
+        const startPosition = await this.mazeCellService.findPlayerPosition(game.id, playerType);
         console.log('startPosition', startPosition);
         if (!startPosition) {
             client.emit(SocketEvents.ERROR, {
