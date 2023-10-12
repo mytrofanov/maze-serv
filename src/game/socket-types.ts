@@ -38,22 +38,9 @@ export type GameExitPayload = {
     playerId: number;
 };
 
-export type CreateGamePayload = {
-    player1Id: string;
-};
-
-export type ConnectToServerPayload = {
-    userName: string;
-    userId?: string;
-};
-
 export type ConnectToGamePayload = {
     gameId: number;
     userId: number;
-};
-
-export type CreateUserPayload = {
-    userName: string;
 };
 
 export enum SocketSuccessCodes {

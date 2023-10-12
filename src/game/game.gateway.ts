@@ -4,15 +4,7 @@ import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 import { GameLogService } from '../game-log/game-log.service';
 import { MazeCellService } from '../cell/cell.service';
-import {
-    ConnectToGamePayload,
-    CreateGamePayload,
-    DirectionPayload,
-    GameExitPayload,
-    GiveUpPayload,
-    MessagePayload,
-    SocketEvents,
-} from './socket-types';
+import { DirectionPayload, GameExitPayload, GiveUpPayload, MessagePayload, SocketEvents } from './socket-types';
 import * as process from 'process';
 import 'dotenv/config';
 import {
