@@ -19,7 +19,7 @@ import {
 import { PlayerType } from '../users/users.model';
 import * as process from 'process';
 import 'dotenv/config';
-import { handleConnection } from './handlers';
+import { handleConnection, handleCreateGame } from './handlers';
 
 @WebSocketGateway({
     cors: {
@@ -46,22 +46,7 @@ export class GameGateway implements OnGatewayConnection {
     //CREATE_GAME
     @SubscribeMessage(SocketEvents.CREATE_GAME)
     async handleCreateGame(client: any, payload: CreateGamePayload): Promise<any> {
-        const newGame = await this.gameService.createGame(payload);
-        const newMaze = await this.mazeCellService.createRandomMaze(newGame.id);
-
-        if (!newGame || !newMaze) {
-            client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.GAME_NOT_CREATED,
-                message: 'Error occurred while creating game',
-            });
-        }
-        client.emit(SocketEvents.GAME_CREATED, { game: newGame, maze: newMaze });
-        const availableGames = await this.gameService.getAvailableGames();
-        if (availableGames && availableGames.length) {
-            this.server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
-        } else {
-            this.server.emit(SocketEvents.AVAILABLE_GAMES, []);
-        }
+        await handleCreateGame(this.gameService, this.mazeCellService, this.server)(client, payload);
     }
 
     //CONNECT_GAME
