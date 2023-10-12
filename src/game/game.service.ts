@@ -3,8 +3,9 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Game, GameStatus } from './game.model';
 import { MazeCellService } from '../cell/cell.service';
 import { UsersService } from '../users/users.service';
-import { ConnectToGamePayload, CreateGamePayload } from './socket-types';
+import { ConnectToGamePayload } from './socket-types';
 import { PlayerType, User } from '../users/users.model';
+import { CreateGameDto } from './dtos';
 
 @Injectable()
 export class GameService {
@@ -16,7 +17,7 @@ export class GameService {
         private readonly usersService: UsersService,
     ) {}
 
-    async createGame(payload: CreateGamePayload): Promise<Game> {
+    async createGame(payload: CreateGameDto): Promise<Game> {
         const { player1Id } = payload;
 
         return await this.gameModel.create({

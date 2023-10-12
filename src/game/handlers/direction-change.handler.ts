@@ -1,14 +1,15 @@
-import { DirectionPayload, SocketErrorCodes, SocketEvents } from '../socket-types';
+import { SocketErrorCodes, SocketEvents } from '../socket-types';
 import { GameService } from '../game.service';
 import { GameLogService } from '../../game-log/game-log.service';
 import { MazeCellService } from '../../cell/cell.service';
 import { Server } from 'socket.io';
 import { PlayerType } from '../../users/users.model';
 import { newPosition } from '../../utils';
+import { DirectionDto } from '../dtos';
 
 export const handleDirectionChange =
     (gameService: GameService, logService: GameLogService, mazeCellService: MazeCellService, server: Server) =>
-    async (client: any, payload: DirectionPayload): Promise<any> => {
+    async (client: any, payload: DirectionDto): Promise<any> => {
         const { direction, gameId, playerId, message } = payload;
         const game = await gameService.findGame(gameId);
 

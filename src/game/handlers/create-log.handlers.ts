@@ -1,7 +1,7 @@
 import { SocketEvents } from '../socket-types';
 import { GameLogService } from '../../game-log/game-log.service';
 import { Server } from 'socket.io';
-import { LogDto } from '../dtos/create-log.dto';
+import { LogDto } from '../dtos';
 
 export const handleCreateLog =
     (logService: GameLogService, server: Server) =>

@@ -1,11 +1,12 @@
-import { GiveUpPayload, SocketEvents } from '../socket-types';
+import { SocketEvents } from '../socket-types';
 import { PlayerType } from '../../users/users.model';
 import { GameService } from '../game.service';
 import { Server } from 'socket.io';
+import { GiveUpDto } from '../dtos';
 
 export const handleGiveUp =
     (gameService: GameService, server: Server) =>
-    async (client: any, payload: GiveUpPayload): Promise<any> => {
+    async (client: any, payload: GiveUpDto): Promise<any> => {
         const { gameId, playerId } = payload;
         const game = await gameService.findGame(gameId);
         const updatedGame = await gameService.setWinner(
