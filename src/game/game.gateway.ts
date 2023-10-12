@@ -11,9 +11,7 @@ import {
     GameExitPayload,
     GiveUpPayload,
     MessagePayload,
-    SocketErrorCodes,
     SocketEvents,
-    SocketSuccessCodes,
 } from './socket-types';
 import * as process from 'process';
 import 'dotenv/config';
@@ -22,6 +20,7 @@ import {
     handleConnection,
     handleCreateGame,
     handleCreateLog,
+    handleCreateUser,
     handleDirectionChange,
     handleExit,
     handleGiveUp,
@@ -93,31 +92,6 @@ export class GameGateway implements OnGatewayConnection {
     //CREATE_USER
     @SubscribeMessage(SocketEvents.CREATE_USER)
     async handleCreateUser(client: any, payload: { userName: string }): Promise<any> {
-        const { userName } = payload;
-
-        if (!userName) {
-            client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.USERNAME_REQUIRED,
-                message: 'Username is required',
-            });
-            return;
-        }
-
-        const user = await this.usersService.createUserIfNotExists({ userName: userName });
-        if (!user) {
-            client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.USERNAME_TAKEN,
-                message: 'Username is already taken or another error occurred.',
-            });
-            return;
-        }
-
-        client.emit(SocketEvents.SUCCESS, {
-            code: SocketSuccessCodes.USER_CREATED,
-            message: 'User successfully created.',
-            payload: {
-                user: user,
-            },
-        });
+        await handleCreateUser(this.usersService)(client, payload);
     }
 }
