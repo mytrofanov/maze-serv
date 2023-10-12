@@ -1,5 +1,5 @@
 import { Direction } from '../../cell/cell.model';
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class DirectionDto {
     @IsEnum(Direction)
@@ -8,6 +8,7 @@ export class DirectionDto {
     readonly gameId: number;
     @IsNumber()
     readonly playerId: number;
+    @IsOptional()
     @IsString()
-    readonly message: string;
+    readonly message?: string;
 }

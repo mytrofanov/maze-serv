@@ -25,6 +25,7 @@ import {
     handleExit,
     handleGiveUp,
 } from './handlers';
+import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
 
 @WebSocketGateway({
     cors: {
@@ -50,13 +51,13 @@ export class GameGateway implements OnGatewayConnection {
 
     //CREATE_GAME
     @SubscribeMessage(SocketEvents.CREATE_GAME)
-    async handleCreateGame(client: any, payload: CreateGamePayload): Promise<any> {
+    async handleCreateGame(client: any, payload: CreateGameDto): Promise<any> {
         await handleCreateGame(this.gameService, this.mazeCellService, this.server)(client, payload);
     }
 
     //CONNECT_GAME
     @SubscribeMessage(SocketEvents.CONNECT_GAME)
-    async handleConnectGame(client: any, payload: ConnectToGamePayload): Promise<any> {
+    async handleConnectGame(client: any, payload: ConnectToGamePayloadDto): Promise<any> {
         await handleConnectGame(this.gameService, this.mazeCellService, this.server)(client, payload);
     }
 
