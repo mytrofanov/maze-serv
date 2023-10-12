@@ -4,7 +4,6 @@ import { Game, GameStatus } from './game.model';
 import { MazeCellService } from '../cell/cell.service';
 import { UsersService } from '../users/users.service';
 import { ConnectToGamePayload, CreateGamePayload } from './socket-types';
-import { GameLog } from '../game-log/game-log.model';
 import { PlayerType, User } from '../users/users.model';
 
 @Injectable()
@@ -20,14 +19,10 @@ export class GameService {
     async createGame(payload: CreateGamePayload): Promise<Game> {
         const { player1Id } = payload;
 
-        const newGame = await this.gameModel.create({
+        return await this.gameModel.create({
             player1Id,
             status: GameStatus.WAITING_FOR_PLAYER,
         });
-
-        // await this.mazeCellService.createRandomMaze(newGame.id);
-
-        return newGame;
     }
 
     async getAvailableGames(): Promise<Game[]> {
@@ -60,6 +55,17 @@ export class GameService {
         const game = await this.findGame(gameId);
 
         game.currentPlayer = game.currentPlayer === PlayerType.PLAYER1 ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
+        await game.save();
+        return game;
+    }
+
+    async exitGame(gameId: number, playerId: number): Promise<Game> {
+        const game = await this.findGame(gameId);
+
+        if (!game.winner) {
+            game.player1Id === playerId ? (game.winner = PlayerType.PLAYER2) : (game.winner = PlayerType.PLAYER1);
+        }
+        game.status = GameStatus.COMPLETED;
         await game.save();
         return game;
     }

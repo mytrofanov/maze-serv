@@ -11,6 +11,7 @@ export enum SocketEvents {
     DIRECTION = 'DIRECTION',
     DISCONNECT = 'DISCONNECT',
     ERROR = 'ERROR',
+    EXIT = 'EXIT',
     GAME_CONNECTED = 'GAME_CONNECTED',
     GAME_CREATED = 'GAME_CREATED',
     GAME_UPDATED = 'GAME_UPDATED',
@@ -28,6 +29,11 @@ export interface MessagePayload {
 }
 
 export type GiveUpPayload = {
+    gameId: number;
+    playerId: number;
+};
+
+export type GameExitPayload = {
     gameId: number;
     playerId: number;
 };

@@ -9,6 +9,7 @@ import {
     ConnectToGamePayload,
     CreateGamePayload,
     DirectionPayload,
+    GameExitPayload,
     GiveUpPayload,
     MessagePayload,
     SocketErrorCodes,
@@ -185,6 +186,15 @@ export class GameGateway implements OnGatewayConnection {
         );
 
         this.server.emit(SocketEvents.GAME_UPDATED, { game: updatedGame });
+    }
+
+    //EXIT
+    @SubscribeMessage(SocketEvents.EXIT)
+    async handleExit(client: any, payload: GameExitPayload): Promise<any> {
+        const { gameId, playerId } = payload;
+        const game = await this.gameService.exitGame(gameId, playerId);
+
+        this.server.emit(SocketEvents.GAME_UPDATED, { game });
     }
 
     //CREATE_USER
