@@ -180,8 +180,6 @@ export class GameGateway implements OnGatewayConnection {
     async handleGiveUp(client: any, payload: GiveUpPayload): Promise<any> {
         const { gameId, playerId } = payload;
         const game = await this.gameService.findGame(gameId);
-        console.log('game.player1Id === playerId: ', game.player1Id, playerId);
-        console.log('game.player1Id === playerId: ', game.player1Id === playerId);
         const updatedGame = await this.gameService.setWinner(
             game.id,
             game.player1Id === playerId ? PlayerType.PLAYER2 : PlayerType.PLAYER1,
