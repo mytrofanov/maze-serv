@@ -19,7 +19,7 @@ import {
 import { PlayerType } from '../users/users.model';
 import * as process from 'process';
 import 'dotenv/config';
-import { handleConnection, handleCreateGame } from './handlers';
+import { handleConnectGame, handleConnection, handleCreateGame } from './handlers';
 
 @WebSocketGateway({
     cors: {
@@ -52,15 +52,7 @@ export class GameGateway implements OnGatewayConnection {
     //CONNECT_GAME
     @SubscribeMessage(SocketEvents.CONNECT_GAME)
     async handleConnectGame(client: any, payload: ConnectToGamePayload): Promise<any> {
-        const connectedGame = await this.gameService.connectToGame(payload);
-        const maze = await this.mazeCellService.getMazeById(connectedGame.id);
-        if (!connectedGame || !maze) {
-            client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.NETWORK_ERROR,
-                message: 'Error occurred while connecting to game',
-            });
-        }
-        this.server.emit(SocketEvents.GAME_UPDATED, { game: connectedGame, maze: maze });
+        await handleConnectGame(this.gameService, this.mazeCellService, this.server)(client, payload);
     }
 
     //HANDLE DIRECTION CHANGE

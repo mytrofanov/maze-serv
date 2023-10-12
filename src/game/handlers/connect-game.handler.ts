@@ -1,42 +1,20 @@
-import { SocketErrorCodes, SocketEvents, SocketSuccessCodes } from '../socket-types';
+import { ConnectToGamePayload, SocketErrorCodes, SocketEvents } from '../socket-types';
 import { GameService } from '../game.service';
-import { UsersService } from '../../users/users.service';
+import { MazeCellService } from '../../cell/cell.service';
 import { Server } from 'socket.io';
 
-export const handleConnection =
-    (gameService: GameService, usersService: UsersService, server: Server) =>
-    async (client: any, ...args: any[]) => {
-        console.log('Client connected:', client.handshake.query);
-        const connectionPayload = client.handshake.query;
-        const { userName, userId } = connectionPayload;
+export const handleConnectGame =
+    (gameService: GameService, mazeCellService: MazeCellService, server: Server) =>
+    async (client: any, payload: ConnectToGamePayload): Promise<any> => {
+        const connectedGame = await gameService.connectToGame(payload);
+        const maze = await mazeCellService.getMazeById(connectedGame.id);
 
-        if (!userName) {
+        if (!connectedGame || !maze) {
             client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.USERNAME_REQUIRED,
-                message: 'Username is required',
-            });
-        }
-
-        const user = await usersService.createUserIfNotExists({ userName: userName, userId: userId });
-        if (!user) {
-            client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.USERNAME_TAKEN,
-                message: 'Username is already taken or another error occurred.',
+                code: SocketErrorCodes.NETWORK_ERROR,
+                message: 'Error occurred while connecting to game',
             });
         } else {
-            client.emit(SocketEvents.SUCCESS, {
-                code: SocketSuccessCodes.USER_CREATED,
-                message: 'User successfully created.',
-                payload: {
-                    user: user,
-                },
-            });
-        }
-
-        const availableGames = await gameService.getAvailableGames();
-        if (availableGames && availableGames.length) {
-            server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
-        } else {
-            server.emit(SocketEvents.AVAILABLE_GAMES, []);
+            server.emit(SocketEvents.GAME_UPDATED, { game: connectedGame, maze: maze });
         }
     };
