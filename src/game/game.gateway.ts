@@ -2,7 +2,6 @@ import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServe
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
-import { newPosition } from '../utils';
 import { GameLogService } from '../game-log/game-log.service';
 import { MazeCellService } from '../cell/cell.service';
 import {
@@ -19,7 +18,13 @@ import {
 import { PlayerType } from '../users/users.model';
 import * as process from 'process';
 import 'dotenv/config';
-import { handleConnectGame, handleConnection, handleCreateGame } from './handlers';
+import {
+    handleConnectGame,
+    handleConnection,
+    handleCreateGame,
+    handleCreateLog,
+    handleDirectionChange,
+} from './handlers';
 
 @WebSocketGateway({
     cors: {
@@ -58,64 +63,18 @@ export class GameGateway implements OnGatewayConnection {
     //HANDLE DIRECTION CHANGE
     @SubscribeMessage(SocketEvents.DIRECTION)
     async handleDirectionChange(client: any, payload: DirectionPayload): Promise<any> {
-        const { direction, gameId, playerId, message } = payload;
-        const game = await this.gameService.findGame(gameId);
-        if (!game) {
-            client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.GAME_NOT_FOUND,
-                message: `Game with id ${gameId} not found`,
-            });
-        }
-        if (game.currentPlayer === PlayerType.PLAYER1 && playerId !== game.player1Id) {
-            console.log('Player2 cant make move, Player1 should make move');
-            return;
-        }
-        if (game.currentPlayer === PlayerType.PLAYER2 && playerId !== game.player2Id) {
-            console.log('Player1 cant make move, Player2 should make move');
-            return;
-        }
-
-        const playerType = playerId === game.player1Id ? PlayerType.PLAYER1 : PlayerType.PLAYER2;
-        const startPosition = await this.mazeCellService.findPlayerPosition(game.id, playerType);
-        if (!startPosition) {
-            client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.PLAYER_IS_NOT_FOUND,
-                message: 'Player is not found on the maze',
-            });
-        }
-
-        const updatedPosition = newPosition(direction, { x: startPosition.colX, y: startPosition.rowY });
-        //CREATE LOG
-        await this.logService.createLog(
-            gameId,
-            playerType,
-            playerId,
-            direction,
-            updatedPosition.x,
-            updatedPosition.y,
-            message,
-        );
-
-        await this.mazeCellService.handleDirectionChange(gameId, direction, startPosition, updatedPosition, playerType);
-
-        const updatedGameState = await this.gameService.togglePlayer(gameId);
-        const updatedMaze = await this.mazeCellService.getMazeById(gameId);
-        const allLogs = await this.logService.getGameLogs(gameId);
-
-        this.server.emit(SocketEvents.LOG_UPDATED, allLogs);
-        this.server.emit(SocketEvents.GAME_UPDATED, { game: updatedGameState, maze: updatedMaze });
+        await handleDirectionChange(
+            this.gameService,
+            this.logService,
+            this.mazeCellService,
+            this.server,
+        )(client, payload);
     }
 
     //SEND_MESSAGE
     @SubscribeMessage(SocketEvents.SEND_MESSAGE)
     async handleCreateLog(client: any, payload: MessagePayload): Promise<any> {
-        const { gameId, playerId, playerType, message } = payload;
-
-        await this.logService.createLog(gameId, playerType, playerId, undefined, undefined, undefined, message);
-
-        const allLogs = await this.logService.getGameLogs(gameId);
-
-        this.server.emit(SocketEvents.LOG_UPDATED, allLogs);
+        await handleCreateLog(this.logService, this.server)(client, payload);
     }
 
     //GIVE UP
