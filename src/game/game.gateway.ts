@@ -19,9 +19,7 @@ import {
 import { PlayerType } from '../users/users.model';
 import * as process from 'process';
 import 'dotenv/config';
-
-console.log('CORS_URL: ', process.env.CORS_URL);
-console.log('PORT = process.env.PORT : ', process.env.PORT);
+import { handleConnection } from './handlers';
 
 @WebSocketGateway({
     cors: {
@@ -42,39 +40,7 @@ export class GameGateway implements OnGatewayConnection {
 
     //CONNECTION
     async handleConnection(client: any, ...args: any[]) {
-        console.log('Client connected:', client.handshake.query);
-        const connectionPayload = client.handshake.query;
-        const { userName, userId } = connectionPayload;
-
-        if (!userName) {
-            client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.USERNAME_REQUIRED,
-                message: 'Username is required',
-            });
-        }
-
-        const user = await this.usersService.createUserIfNotExists({ userName: userName, userId: userId });
-        if (!user) {
-            client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.USERNAME_TAKEN,
-                message: 'Username is already taken or another error occurred.',
-            });
-        } else {
-            client.emit(SocketEvents.SUCCESS, {
-                code: SocketSuccessCodes.USER_CREATED,
-                message: 'User successfully created.',
-                payload: {
-                    user: user,
-                },
-            });
-        }
-
-        const availableGames = await this.gameService.getAvailableGames();
-        if (availableGames && availableGames.length) {
-            this.server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
-        } else {
-            this.server.emit(SocketEvents.AVAILABLE_GAMES, []);
-        }
+        await handleConnection(this.gameService, this.usersService, this.server)(client, ...args);
     }
 
     //CREATE_GAME
