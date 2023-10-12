@@ -22,6 +22,7 @@ export class GameService {
         return await this.gameModel.create({
             player1Id,
             status: GameStatus.WAITING_FOR_PLAYER,
+            winner: null,
         });
     }
 

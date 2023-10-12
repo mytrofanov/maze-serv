@@ -1,11 +1,12 @@
-import { ConnectToGamePayload, SocketErrorCodes, SocketEvents } from '../socket-types';
+import { SocketErrorCodes, SocketEvents } from '../socket-types';
 import { GameService } from '../game.service';
 import { MazeCellService } from '../../cell/cell.service';
 import { Server } from 'socket.io';
+import { ConnectToGamePayloadDto } from '../dtos/connect-game.dto';
 
 export const handleConnectGame =
     (gameService: GameService, mazeCellService: MazeCellService, server: Server) =>
-    async (client: any, payload: ConnectToGamePayload): Promise<any> => {
+    async (client: any, payload: ConnectToGamePayloadDto): Promise<any> => {
         const connectedGame = await gameService.connectToGame(payload);
         const maze = await mazeCellService.getMazeById(connectedGame.id);
 
