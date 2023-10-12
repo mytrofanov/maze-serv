@@ -15,7 +15,6 @@ import {
     SocketEvents,
     SocketSuccessCodes,
 } from './socket-types';
-import { PlayerType } from '../users/users.model';
 import * as process from 'process';
 import 'dotenv/config';
 import {
@@ -24,6 +23,7 @@ import {
     handleCreateGame,
     handleCreateLog,
     handleDirectionChange,
+    handleGiveUp,
 } from './handlers';
 
 @WebSocketGateway({
@@ -80,14 +80,7 @@ export class GameGateway implements OnGatewayConnection {
     //GIVE UP
     @SubscribeMessage(SocketEvents.GIVE_UP)
     async handleGiveUp(client: any, payload: GiveUpPayload): Promise<any> {
-        const { gameId, playerId } = payload;
-        const game = await this.gameService.findGame(gameId);
-        const updatedGame = await this.gameService.setWinner(
-            game.id,
-            game.player1Id === playerId ? PlayerType.PLAYER2 : PlayerType.PLAYER1,
-        );
-
-        this.server.emit(SocketEvents.GAME_UPDATED, { game: updatedGame });
+        await handleGiveUp(this.gameService, this.server)(client, payload);
     }
 
     //EXIT

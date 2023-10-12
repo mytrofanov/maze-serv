@@ -77,7 +77,6 @@ export class GameService {
         }
 
         game.winner = winner;
-        game.status = GameStatus.COMPLETED;
         await game.save();
 
         return game;
