@@ -5,6 +5,7 @@ import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express
 import * as express from 'express';
 import * as cors from 'cors';
 import { Sequelize } from 'sequelize-typescript';
+import 'dotenv/config';
 
 async function bootstrap() {
     const PORT = process.env.PORT || 5000;

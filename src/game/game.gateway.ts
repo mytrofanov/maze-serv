@@ -9,18 +9,22 @@ import {
     ConnectToGamePayload,
     CreateGamePayload,
     DirectionPayload,
+    GiveUpPayload,
     MessagePayload,
     SocketErrorCodes,
     SocketEvents,
     SocketSuccessCodes,
 } from './socket-types';
 import { PlayerType } from '../users/users.model';
+import * as process from 'process';
+import 'dotenv/config';
 
-const localHost = 'http://localhost:5173';
+console.log('CORS_URL: ', process.env.CORS_URL);
+console.log('PORT = process.env.PORT : ', process.env.PORT);
 
 @WebSocketGateway({
     cors: {
-        origin: 'http://localhost:5173',
+        origin: process.env.CORS_URL,
         credentials: true,
     },
 }) // can choose port @WebSocketGateway(4001), for example
@@ -75,7 +79,6 @@ export class GameGateway implements OnGatewayConnection {
     //CREATE_GAME
     @SubscribeMessage(SocketEvents.CREATE_GAME)
     async handleCreateGame(client: any, payload: CreateGamePayload): Promise<any> {
-        console.log('handleCreateGame: ', payload);
         const newGame = await this.gameService.createGame(payload);
         const newMaze = await this.mazeCellService.createRandomMaze(newGame.id);
 
@@ -111,8 +114,6 @@ export class GameGateway implements OnGatewayConnection {
     //HANDLE DIRECTION CHANGE
     @SubscribeMessage(SocketEvents.DIRECTION)
     async handleDirectionChange(client: any, payload: DirectionPayload): Promise<any> {
-        console.log('handleDirectionChange: ', payload);
-        //const { direction, gameId, playerId, playerType, message } = payload;
         const { direction, gameId, playerId, message } = payload;
         const game = await this.gameService.findGame(gameId);
         if (!game) {
@@ -122,33 +123,16 @@ export class GameGateway implements OnGatewayConnection {
             });
         }
         if (game.currentPlayer === PlayerType.PLAYER1 && playerId !== game.player1Id) {
-            console.log(
-                'game.currentPlayer:',
-                game.currentPlayer,
-                'playerId: ',
-                playerId,
-                'game.player1Id: ',
-                game.player1Id,
-            );
             console.log('Player2 cant make move, Player1 should make move');
             return;
         }
         if (game.currentPlayer === PlayerType.PLAYER2 && playerId !== game.player2Id) {
-            console.log(
-                'game.currentPlayer:',
-                game.currentPlayer,
-                'playerId: ',
-                playerId,
-                'game.player2Id: ',
-                game.player2Id,
-            );
             console.log('Player1 cant make move, Player2 should make move');
             return;
         }
 
         const playerType = playerId === game.player1Id ? PlayerType.PLAYER1 : PlayerType.PLAYER2;
         const startPosition = await this.mazeCellService.findPlayerPosition(game.id, playerType);
-        console.log('startPosition', startPosition);
         if (!startPosition) {
             client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.PLAYER_IS_NOT_FOUND,
@@ -157,7 +141,6 @@ export class GameGateway implements OnGatewayConnection {
         }
 
         const updatedPosition = newPosition(direction, { x: startPosition.colX, y: startPosition.rowY });
-        console.log('updatedPosition', updatedPosition);
         //CREATE LOG
         await this.logService.createLog(
             gameId,
@@ -189,6 +172,19 @@ export class GameGateway implements OnGatewayConnection {
         const allLogs = await this.logService.getGameLogs(gameId);
 
         this.server.emit(SocketEvents.LOG_UPDATED, allLogs);
+    }
+
+    //GIVE UP
+    @SubscribeMessage(SocketEvents.GIVE_UP)
+    async handleGiveUp(client: any, payload: GiveUpPayload): Promise<any> {
+        const { gameId, playerId } = payload;
+        const game = await this.gameService.findGame(gameId);
+        const updatedGame = await this.gameService.setWinner(
+            game.id,
+            game.player1Id === playerId ? PlayerType.PLAYER2 : PlayerType.PLAYER1,
+        );
+
+        this.server.emit(SocketEvents.GAME_UPDATED, { game: updatedGame });
     }
 
     //CREATE_USER

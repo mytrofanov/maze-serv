@@ -11,12 +11,13 @@ export enum SocketEvents {
     DIRECTION = 'DIRECTION',
     DISCONNECT = 'DISCONNECT',
     ERROR = 'ERROR',
-    GAME_CREATED = 'GAME_CREATED',
     GAME_CONNECTED = 'GAME_CONNECTED',
+    GAME_CREATED = 'GAME_CREATED',
     GAME_UPDATED = 'GAME_UPDATED',
+    GIVE_UP = 'GIVE_UP',
     LOG_UPDATED = 'LOG_UPDATED',
-    SUCCESS = 'SUCCESS',
     SEND_MESSAGE = 'SEND_MESSAGE',
+    SUCCESS = 'SUCCESS',
 }
 
 export interface MessagePayload {
@@ -25,6 +26,11 @@ export interface MessagePayload {
     playerType: PlayerType;
     message: string;
 }
+
+export type GiveUpPayload = {
+    gameId: number;
+    playerId: number;
+};
 
 export type CreateGamePayload = {
     player1Id: string;
@@ -82,6 +88,5 @@ export interface DirectionPayload {
     direction: Direction;
     gameId: number;
     playerId: number;
-    // playerType: PlayerType;
     message?: string;
 }
