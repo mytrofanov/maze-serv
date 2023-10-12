@@ -25,7 +25,7 @@ export class GameService {
             status: GameStatus.WAITING_FOR_PLAYER,
         });
 
-        await this.mazeCellService.createRandomMaze(newGame.id);
+        // await this.mazeCellService.createRandomMaze(newGame.id);
 
         return newGame;
     }

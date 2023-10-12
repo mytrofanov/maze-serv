@@ -104,7 +104,7 @@ export class MazeCellService {
             // });
             //clear prev cell
             prevCell.revealed = true;
-            prevCell.player = undefined;
+            prevCell.player = null;
             prevCell.direction = direction;
             await prevCell.save();
             console.log('prevCell: ', prevCell);

@@ -35,6 +35,7 @@ export class GameGateway implements OnGatewayConnection {
         private readonly mazeCellService: MazeCellService,
     ) {}
 
+    //CONNECTION
     async handleConnection(client: any, ...args: any[]) {
         console.log('Client connected:', client.handshake.query);
         const connectionPayload = client.handshake.query;
@@ -71,6 +72,7 @@ export class GameGateway implements OnGatewayConnection {
         }
     }
 
+    //CREATE_GAME
     @SubscribeMessage(SocketEvents.CREATE_GAME)
     async handleCreateGame(client: any, payload: CreateGamePayload): Promise<any> {
         console.log('handleCreateGame: ', payload);
@@ -92,6 +94,7 @@ export class GameGateway implements OnGatewayConnection {
         }
     }
 
+    //CONNECT_GAME
     @SubscribeMessage(SocketEvents.CONNECT_GAME)
     async handleConnectGame(client: any, payload: ConnectToGamePayload): Promise<any> {
         const connectedGame = await this.gameService.connectToGame(payload);
@@ -105,6 +108,7 @@ export class GameGateway implements OnGatewayConnection {
         this.server.emit(SocketEvents.GAME_UPDATED, { game: connectedGame, maze: maze });
     }
 
+    //HANDLE DIRECTION CHANGE
     @SubscribeMessage(SocketEvents.DIRECTION)
     async handleDirectionChange(client: any, payload: DirectionPayload): Promise<any> {
         console.log('handleDirectionChange: ', payload);
@@ -152,6 +156,7 @@ export class GameGateway implements OnGatewayConnection {
 
         const updatedPosition = newPosition(direction, { x: startPosition.colX, y: startPosition.rowY });
         console.log('updatedPosition', updatedPosition);
+        //CREATE LOG
         await this.logService.createLog(
             gameId,
             playerType,
@@ -172,6 +177,7 @@ export class GameGateway implements OnGatewayConnection {
         this.server.emit(SocketEvents.GAME_UPDATED, { game: updatedGameState, maze: updatedMaze });
     }
 
+    //SEND_MESSAGE
     @SubscribeMessage(SocketEvents.SEND_MESSAGE)
     async handleCreateLog(client: any, payload: MessagePayload): Promise<any> {
         const { gameId, playerId, playerType, message } = payload;
@@ -183,6 +189,7 @@ export class GameGateway implements OnGatewayConnection {
         this.server.emit(SocketEvents.LOG_UPDATED, allLogs);
     }
 
+    //CREATE_USER
     @SubscribeMessage(SocketEvents.CREATE_USER)
     async handleCreateUser(client: any, payload: { userName: string }): Promise<any> {
         const { userName } = payload;
