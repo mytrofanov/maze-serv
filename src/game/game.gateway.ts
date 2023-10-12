@@ -23,6 +23,7 @@ import {
     handleCreateGame,
     handleCreateLog,
     handleDirectionChange,
+    handleExit,
     handleGiveUp,
 } from './handlers';
 
@@ -86,10 +87,7 @@ export class GameGateway implements OnGatewayConnection {
     //EXIT
     @SubscribeMessage(SocketEvents.EXIT)
     async handleExit(client: any, payload: GameExitPayload): Promise<any> {
-        const { gameId, playerId } = payload;
-        const game = await this.gameService.exitGame(gameId, playerId);
-
-        this.server.emit(SocketEvents.GAME_UPDATED, { game });
+        await handleExit(this.gameService, this.server)(client, payload);
     }
 
     //CREATE_USER
