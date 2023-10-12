@@ -61,7 +61,6 @@ export class MazeCellService {
         if (!cell) {
             throw new NotFoundException(`Cell with player ${player} not found in the game with ID ${gameId}`);
         }
-        // const position = { x: cell.colX, y: cell.rowY };
         return cell;
     }
     async handleDirectionChange(
@@ -98,27 +97,15 @@ export class MazeCellService {
             newCell.player = currentPlayer;
             await newCell.save();
             console.log('newCell: ', newCell);
-            // await this.updateCell(newCell.id, {
-            //     revealed: true,
-            //     player: currentPlayer,
-            // });
+
             //clear prev cell
             prevCell.revealed = true;
             prevCell.player = null;
             prevCell.direction = direction;
             await prevCell.save();
-            console.log('prevCell: ', prevCell);
-            // await this.updateCell(prevCell.id, {
-            //     revealed: true,
-            //     player: undefined,
-            //     direction: direction,
-            // });
         }
         //if wall
         newCell.revealed = true;
         await newCell.save();
-        // await this.updateCell(newCell.id, {
-        //     revealed: true,
-        // });
     }
 }

@@ -112,7 +112,8 @@ export class GameGateway implements OnGatewayConnection {
     @SubscribeMessage(SocketEvents.DIRECTION)
     async handleDirectionChange(client: any, payload: DirectionPayload): Promise<any> {
         console.log('handleDirectionChange: ', payload);
-        const { direction, gameId, playerId, playerType, message } = payload;
+        //const { direction, gameId, playerId, playerType, message } = payload;
+        const { direction, gameId, playerId, message } = payload;
         const game = await this.gameService.findGame(gameId);
         if (!game) {
             client.emit(SocketEvents.ERROR, {
@@ -145,6 +146,7 @@ export class GameGateway implements OnGatewayConnection {
             return;
         }
 
+        const playerType = playerId === game.player1Id ? PlayerType.PLAYER1 : PlayerType.PLAYER2;
         const startPosition = await this.mazeCellService.findPlayerPosition(game.id, playerType);
         console.log('startPosition', startPosition);
         if (!startPosition) {

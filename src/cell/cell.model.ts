@@ -20,15 +20,6 @@ export type Position = {
     y: number;
 };
 
-// export type MazeCellType = {
-//     gameId: number;
-//     position: Position;
-//     type: Cell;
-//     revealed: boolean;
-//     direction?: Direction;
-//     player?: PlayerType;
-// };
-
 @Table({ tableName: 'MazeCell', timestamps: true })
 export class MazeCell extends Model {
     @Column({ type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
