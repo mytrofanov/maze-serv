@@ -1,5 +1,5 @@
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from 'sequelize-typescript';
-import { Row } from '../row/row.model';
+import { Row } from '../row';
 import { Game } from '../game';
 
 @Table({ tableName: 'Maze', timestamps: true })

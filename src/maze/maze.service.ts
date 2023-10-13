@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Cell, Direction, MazeCell, MazeCellService, Position } from '../cell';
 import { Mazes } from '../lib/mazes';
 import { GameService } from '../game';
-import { PlayerType } from '../users/users.model';
+import { PlayerType } from '../users';
 import { Row, RowService } from '../row';
 import { Maze } from './maze.model';
 
@@ -79,7 +79,7 @@ export class MazeService {
         return this.getMazeById(createdMaze.id);
     }
 
-    async findPlayerPosition(gameId: number, player: PlayerType): Promise<{ rowY: Row; colX: MazeCell } | null> {
+    async findPlayerPosition(gameId: number, player: PlayerType): Promise<{ y: Row; x: MazeCell } | null> {
         // Find the Row containing the player using RowService.
         const foundRow = await this.rowService.findRowWithPlayer(gameId, player);
 
@@ -92,7 +92,7 @@ export class MazeService {
 
             // If MazeCell is found, return the ids
             if (foundCell) {
-                return { rowY: foundRow, colX: foundCell };
+                return { y: foundRow, x: foundCell };
             }
         }
 
