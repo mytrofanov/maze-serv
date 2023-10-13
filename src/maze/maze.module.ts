@@ -5,9 +5,10 @@ import { Maze } from './maze.model';
 import { MazeService } from './maze.service';
 import { GameService } from '../game';
 import { RowService } from '../row';
+import { RowModule } from '../row/row.module';
 
 @Module({
-    imports: [SequelizeModule.forFeature([Maze]), forwardRef(() => MazeCellModule), RowModule],
+    imports: [SequelizeModule.forFeature([Maze]), forwardRef(() => MazeCellModule), RowModule, GameModule],
     providers: [MazeService, GameService, RowService, MazeCellService],
     exports: [MazeService],
 })
