@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Row } from './row.model';
 import { MazeCell } from '../cell';
-import { PlayerType } from '../users/users.model';
+import { PlayerType } from '../users';
 import { Maze } from '../maze';
 
 @Injectable()

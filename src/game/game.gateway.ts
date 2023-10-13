@@ -60,12 +60,7 @@ export class GameGateway implements OnGatewayConnection {
     //HANDLE DIRECTION CHANGE
     @SubscribeMessage(SocketEvents.DIRECTION)
     async handleDirectionChange(client: any, payload: DirectionPayload): Promise<any> {
-        await handleDirectionChange(
-            this.gameService,
-            this.logService,
-            this.mazeCellService,
-            this.server,
-        )(client, payload);
+        await handleDirectionChange(this.gameService, this.logService, this.mazeService, this.server)(client, payload);
     }
 
     //SEND_MESSAGE

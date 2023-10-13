@@ -2,7 +2,7 @@ import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from '
 
 import { Maze } from '../maze';
 import { MazeCell } from '../cell';
-import { PlayerType } from '../users/users.model';
+import { PlayerType } from '../users';
 
 @Table({ tableName: 'Row', timestamps: true })
 export class Row extends Model {

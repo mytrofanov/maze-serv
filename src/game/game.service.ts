@@ -1,9 +1,8 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Game, GameStatus } from './game.model';
-import { UsersService } from '../users/users.service';
 import { ConnectToGamePayload } from './socket-types';
-import { PlayerType, User } from '../users/users.model';
+import { PlayerType, User, UsersService } from '../users';
 import { CreateGameDto } from './dtos';
 
 @Injectable()
@@ -16,7 +15,7 @@ export class GameService {
 
     async createGame(payload: CreateGameDto): Promise<Game> {
         const { player1Id } = payload;
-
+        await this.usersService.updateUser(player1Id, { type: PlayerType.PLAYER1 });
         return await this.gameModel.create({
             player1Id,
             status: GameStatus.WAITING_FOR_PLAYER,
@@ -96,6 +95,7 @@ export class GameService {
         if (game.status !== GameStatus.WAITING_FOR_PLAYER) {
             throw new ConflictException('The game is either already in progress or completed');
         }
+        await this.usersService.updateUser(user.id, { type: PlayerType.PLAYER2 });
 
         game.player2Id = user.id;
         game.status = GameStatus.IN_PROGRESS;

@@ -8,25 +8,30 @@ import { checkForNullUndefined } from '../utils';
 export class UsersService {
     constructor(
         @InjectModel(User)
-        private userRepository: typeof User,
+        private userModel: typeof User,
     ) {}
 
     async createUser(dto: CreateUserDto) {
         console.log('createUser dto: ', dto);
-        const user = await this.userRepository.create({ userName: dto.userName });
+        const user = await this.userModel.create({ userName: dto.userName });
         return user;
     }
 
     async getAllUsers() {
-        return await this.userRepository.findAll({ include: { all: true } });
+        return await this.userModel.findAll({ include: { all: true } });
+    }
+
+    async updateUser(userId: number, changes: Partial<User>) {
+        const user = await this.getUserById(userId);
+        return user.update(changes);
     }
 
     async getUserByName(userName: string) {
-        return await this.userRepository.findOne({ where: { userName }, include: { all: true } });
+        return await this.userModel.findOne({ where: { userName }, include: { all: true } });
     }
 
     async getUserById(id: number) {
-        return await this.userRepository.findOne({ where: { id }, include: { all: true } });
+        return await this.userModel.findOne({ where: { id }, include: { all: true } });
     }
 
     async isUserNameTaken(userName: string): Promise<boolean> {
