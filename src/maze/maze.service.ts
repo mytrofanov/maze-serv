@@ -12,7 +12,6 @@ export class MazeService {
     constructor(
         @InjectModel(Maze)
         private readonly mazeModel: typeof Maze,
-        @InjectModel(Row) private readonly rowModel: typeof Row,
         @Inject(forwardRef(() => GameService))
         private readonly gameService: GameService,
         @Inject(forwardRef(() => RowService))
@@ -68,7 +67,7 @@ export class MazeService {
             const row = matrix[y];
 
             // Create a Row instance and associate it with the Maze.
-            const createdRow = await this.rowModel.create({
+            const createdRow = await this.rowService.createRow({
                 rowY: y,
                 mazeId: createdMaze.id,
             });

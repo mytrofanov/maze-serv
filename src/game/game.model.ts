@@ -1,5 +1,5 @@
 import { Model, Column, DataType, Table, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
-import { MazeCell } from '../cell/cell.model';
+import { MazeCell } from '../cell';
 import { GameLog } from '../game-log/game-log.model';
 import { PlayerType, User } from '../users/users.model';
 

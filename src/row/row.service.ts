@@ -7,10 +7,7 @@ import { Maze } from '../maze';
 
 @Injectable()
 export class RowService {
-    constructor(
-        @InjectModel(Row) private readonly rowModel: typeof Row,
-        @InjectModel(MazeCell) private readonly mazeCellModel: typeof MazeCell,
-    ) {}
+    constructor(@InjectModel(Row) private readonly rowModel: typeof Row) {}
 
     async findRowWithPlayer(gameId: number, player: PlayerType): Promise<Row | null> {
         return await this.rowModel.findOne({
@@ -43,5 +40,9 @@ export class RowService {
         }
 
         return row;
+    }
+
+    async createRow(values: Partial<Row>): Promise<Row | null> {
+        return await this.rowModel.create(values);
     }
 }
