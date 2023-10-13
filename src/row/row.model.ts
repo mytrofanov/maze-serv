@@ -3,7 +3,6 @@ import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from '
 import { Maze } from '../maze/maze.model';
 import { MazeCell } from '../cell/cell.model';
 import { PlayerType } from '../users';
-import { forwardRef } from '@nestjs/common';
 
 @Table({ tableName: 'Row', timestamps: true })
 export class Row extends Model {
@@ -17,12 +16,12 @@ export class Row extends Model {
     @Column({ type: DataType.INTEGER })
     mazeId: number;
 
-    @BelongsTo(() => forwardRef(() => Maze) as any)
+    @BelongsTo(() => Maze)
     maze: Maze;
 
     @Column({ type: DataType.ENUM, values: Object.values(PlayerType), allowNull: true })
     player?: PlayerType;
 
-    @HasMany(() => forwardRef(() => MazeCell) as any)
+    @HasMany(() => MazeCell)
     cells: MazeCell[];
 }

@@ -1,7 +1,6 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { PlayerType } from '../users';
 import { Row } from '../row';
-import { forwardRef } from '@nestjs/common';
 
 export enum Cell {
     WALL = 'WALL',
@@ -41,10 +40,10 @@ export class MazeCell extends Model {
     @Column({ type: DataType.ENUM, values: Object.values(PlayerType), allowNull: true })
     player?: PlayerType;
 
-    @ForeignKey(() => forwardRef(() => Row) as any)
+    @ForeignKey(() => Row)
     @Column({ type: DataType.INTEGER })
     rowId: number;
 
-    @BelongsTo(() => forwardRef(() => Row) as any)
+    @BelongsTo(() => Row)
     row: Row;
 }

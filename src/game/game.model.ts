@@ -2,7 +2,6 @@ import { Model, Column, DataType, Table, ForeignKey, BelongsTo, HasMany } from '
 import { GameLog } from '../game-log';
 import { PlayerType, User } from '../users';
 import { Maze } from '../maze/maze.model';
-import { forwardRef } from '@nestjs/common';
 
 export enum GameStatus {
     WAITING_FOR_PLAYER = 'WAITING_FOR_PLAYER',
@@ -55,7 +54,7 @@ export class Game extends Model {
     @Column(DataType.INTEGER)
     mazeId: number;
 
-    @BelongsTo(() => forwardRef(() => Maze) as any)
+    @BelongsTo(() => Maze)
     maze: Maze;
 
     @HasMany(() => GameLog)
