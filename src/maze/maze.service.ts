@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Cell, Direction, MazeCell, MazeCellService, Position } from '../cell';
-import { MazeMatrixCell } from '../lib/mazes';
+import { MazeMatrixCell, Mazes } from '../lib/mazes';
 import { GameService } from '../game';
 import { PlayerType } from '../users/users.model';
 import { Row, RowService } from '../row';
@@ -59,12 +59,13 @@ export class MazeService {
     //     return this.getMazeById(gameId);
     // }
 
-    async createMazeFromMatrix(matrix: MazeMatrixCell[][], gameId: number): Promise<Maze> {
+    async createRandomMaze(gameId: number): Promise<Maze> {
+        const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
         const createdMaze = await this.mazeModel.create({ gameId });
 
         // Iterate through the matrix to create Rows and MazeCells.
-        for (let y = 0; y < matrix.length; y++) {
-            const row = matrix[y];
+        for (let y = 0; y < randomMazeData.length; y++) {
+            const row = randomMazeData[y];
 
             // Create a Row instance and associate it with the Maze.
             const createdRow = await this.rowService.createRow({

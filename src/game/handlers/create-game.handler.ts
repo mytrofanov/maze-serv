@@ -1,14 +1,14 @@
 import { SocketErrorCodes, SocketEvents } from '../socket-types';
 import { GameService } from '../game.service';
-import { MazeCellService } from '../../cell/cell.service';
 import { Server } from 'socket.io';
 import { CreateGameDto } from '../dtos';
+import { MazeService } from '../../maze';
 
 export const handleCreateGame =
-    (gameService: GameService, mazeCellService: MazeCellService, server: Server) =>
+    (gameService: GameService, mazeService: MazeService, server: Server) =>
     async (client: any, payload: CreateGameDto): Promise<any> => {
         const newGame = await gameService.createGame(payload);
-        const newMaze = await mazeCellService.createRandomMaze(newGame.id);
+        const newMaze = await mazeService.createRandomMaze(newGame.id);
 
         if (!newGame || !newMaze) {
             client.emit(SocketEvents.ERROR, {
@@ -20,9 +20,5 @@ export const handleCreateGame =
         }
 
         const availableGames = await gameService.getAvailableGames();
-        if (availableGames && availableGames.length) {
-            server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
-        } else {
-            server.emit(SocketEvents.AVAILABLE_GAMES, []);
-        }
+        server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
     };

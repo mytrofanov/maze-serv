@@ -48,7 +48,7 @@ export class GameGateway implements OnGatewayConnection {
     //CREATE_GAME
     @SubscribeMessage(SocketEvents.CREATE_GAME)
     async handleCreateGame(client: any, payload: CreateGameDto): Promise<any> {
-        await handleCreateGame(this.gameService, this.mazeCellService, this.server)(client, payload);
+        await handleCreateGame(this.gameService, this.mazeService, this.server)(client, payload);
     }
 
     //CONNECT_GAME
