@@ -1,4 +1,4 @@
-import { Cell, Direction } from '../cell';
+import { Cell, Direction } from '../cell/cell.model';
 import { PlayerType } from '../users/users.model';
 
 export type MazeMatrixCell = {

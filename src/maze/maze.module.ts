@@ -1,10 +1,11 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { MazeCellModule, MazeCellService } from '../cell';
+import { MazeCellModule } from '../cell/cell.module';
+//import { MazeCellService } from '../cell/cell.service';
 import { Maze } from './maze.model';
 import { MazeService } from './maze.service';
-import { GameModule, GameService } from '../game';
-import { RowService } from '../row';
+import { GameModule } from '../game';
+// import { RowService } from '../row';
 import { RowModule } from '../row/row.module';
 
 @Module({
@@ -14,7 +15,7 @@ import { RowModule } from '../row/row.module';
         forwardRef(() => MazeCellModule),
         forwardRef(() => RowModule),
     ],
-    providers: [MazeService, GameService, RowService, MazeCellService],
+    providers: [MazeService],
     exports: [MazeService],
 })
 export class MazeModule {}

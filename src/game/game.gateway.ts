@@ -17,7 +17,7 @@ import {
     handleGiveUp,
 } from './handlers';
 import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
-import { MazeService } from '../maze';
+import { MazeService } from '../maze/maze.service';
 
 @WebSocketGateway({
     cors: {

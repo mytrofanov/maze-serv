@@ -1,6 +1,7 @@
 import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Cell, Direction, MazeCell, MazeCellService, Position } from '../cell';
+import { Cell, Direction, MazeCell, Position } from '../cell/cell.model';
+import { MazeCellService } from '../cell/cell.service';
 import { Mazes } from '../lib/mazes';
 import { GameService } from '../game';
 import { PlayerType } from '../users';
@@ -80,8 +81,12 @@ export class MazeService {
     }
 
     async findPlayerPosition(gameId: number, player: PlayerType): Promise<{ y: Row; x: MazeCell } | null> {
+        const game = await this.gameService.findGame(gameId);
+        if (!game) {
+            throw new NotFoundException(`No game found with id:${gameId} `);
+        }
         // Find the Row containing the player using RowService.
-        const foundRow = await this.rowService.findRowWithPlayer(gameId, player);
+        const foundRow = await this.rowService.findRowWithPlayer(game.mazeId, player);
 
         // If Row is found, find the MazeCell containing the player.
         if (foundRow) {

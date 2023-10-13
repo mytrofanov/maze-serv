@@ -1,7 +1,7 @@
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from 'sequelize-typescript';
 
-import { Maze } from '../maze';
-import { MazeCell } from '../cell';
+import { Maze } from '../maze/maze.model';
+import { MazeCell } from '../cell/cell.model';
 import { PlayerType } from '../users';
 import { forwardRef } from '@nestjs/common';
 
@@ -17,7 +17,7 @@ export class Row extends Model {
     @Column({ type: DataType.INTEGER })
     mazeId: number;
 
-    @BelongsTo(() => Maze)
+    @BelongsTo(() => forwardRef(() => Maze) as any)
     maze: Maze;
 
     @Column({ type: DataType.ENUM, values: Object.values(PlayerType), allowNull: true })

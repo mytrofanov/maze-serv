@@ -2,7 +2,7 @@ import { SocketErrorCodes, SocketEvents } from '../socket-types';
 import { GameService } from '../game.service';
 import { Server } from 'socket.io';
 import { ConnectToGamePayloadDto } from '../dtos';
-import { MazeService } from '../../maze';
+import { MazeService } from '../../maze/maze.service';
 
 export const handleConnectGame =
     (gameService: GameService, mazeService: MazeService, server: Server) =>

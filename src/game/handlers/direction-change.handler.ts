@@ -5,7 +5,7 @@ import { Server } from 'socket.io';
 import { PlayerType } from '../../users';
 import { newPosition } from '../../utils';
 import { DirectionDto } from '../dtos';
-import { MazeService } from '../../maze';
+import { MazeService } from '../../maze/maze.service';
 
 export const handleDirectionChange =
     (gameService: GameService, logService: GameLogService, mazeService: MazeService, server: Server) =>
