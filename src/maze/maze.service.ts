@@ -5,7 +5,7 @@ import { MazeMatrixCell, Mazes } from '../lib/mazes';
 import { GameService } from '../game';
 import { PlayerType } from '../users/users.model';
 import { flattenMaze } from '../utils';
-import { Row } from '../row/row.model';
+import { Row, RowService } from '../row';
 import { Maze } from './maze.model';
 
 @Injectable()
@@ -17,6 +17,8 @@ export class MazeService {
         @InjectModel(Row) private readonly rowModel: typeof Row,
         @Inject(forwardRef(() => GameService))
         private readonly gameService: GameService,
+        @Inject(forwardRef(() => RowService))
+        private readonly rowService: RowService,
     ) {}
 
     async getMazeById(gameId: number): Promise<Maze | null> {
@@ -61,7 +63,7 @@ export class MazeService {
     async createMazeFromMatrix(matrix: MazeMatrixCell[][], gameId: number): Promise<Maze> {
         const createdMaze = await this.mazeModel.create({ gameId });
 
-        // 2. Iterate through the matrix to create Rows and MazeCells.
+        // Iterate through the matrix to create Rows and MazeCells.
         for (let y = 0; y < matrix.length; y++) {
             const row = matrix[y];
 
@@ -86,44 +88,33 @@ export class MazeService {
             }
         }
 
-        // 3. Return the created Maze with all associated Rows and MazeCells.
+        // Return the created Maze with all associated Rows and MazeCells.
         return this.getMazeById(createdMaze.id);
     }
 
-    // async findPlayerPosition(gameId: number, player: PlayerType): Promise<MazeCell | null> {
-    //     const cell = await this.mazeCellModel.findOne({
-    //         where: {
-    //             gameId: gameId,
-    //             player: player,
-    //         },
-    //     });
-    //
-    //     if (!cell) {
-    //         throw new NotFoundException(`Cell with player ${player} not found in the game with ID ${gameId}`);
-    //     }
-    //     return cell;
-    // }
+    async findPlayerPosition(gameId: number, player: PlayerType): Promise<{ y: number; x: number } | null> {
+        // Find the Row containing the player using RowService.
+        const foundRow = await this.rowService.findRowWithPlayer(gameId, player);
 
-    async findPlayerPosition(gameId: number, player: PlayerType): Promise<MazeCell | null> {
-        const cell = await this.mazeCellModel.findOne({
-            include: {
-                model: Row,
+        // If Row is found, find the MazeCell containing the player.
+        if (foundRow) {
+            const foundCell = await this.mazeCellModel.findOne({
                 where: {
-                    gameId: gameId,
                     player: player,
+                    rowId: foundRow.id,
                 },
-            },
-            where: {
-                gameId: gameId,
-                player: player,
-            },
-        });
+            });
 
-        if (!cell) {
-            throw new NotFoundException(`Cell with player ${player} not found in the game with ID ${gameId}`);
+            // If MazeCell is found, return the ids
+            if (foundCell) {
+                return { y: foundRow.id, x: foundCell.id };
+            }
         }
-        return cell;
+
+        // If nothing is found, return null.
+        return null;
     }
+
     async handleDirectionChange(
         gameId: number,
         mazeId: number,

@@ -1,6 +1,6 @@
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from 'sequelize-typescript';
 
-import { Maze } from '../maze/maze.model';
+import { Maze } from '../maze';
 import { MazeCell } from '../cell';
 import { PlayerType } from '../users/users.model';
 
