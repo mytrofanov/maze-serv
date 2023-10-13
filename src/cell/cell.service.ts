@@ -17,6 +17,12 @@ export class MazeCellService {
         return await this.mazeCellModel.create(values);
     }
 
+    async findCell(values: Partial<MazeCell>): Promise<MazeCell> {
+        return await this.mazeCellModel.findOne({
+            where: values,
+        });
+    }
+
     async updateCell(cellId: number, changes: Partial<MazeCell>): Promise<MazeCell> {
         const cell = await this.mazeCellModel.findByPk(cellId);
         if (!cell) {
