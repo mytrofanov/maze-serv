@@ -1,4 +1,4 @@
-import { Model, Column, DataType, Table, ForeignKey, BelongsTo, HasMany, HasOne } from 'sequelize-typescript';
+import { Model, Column, DataType, Table, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import { GameLog } from '../game-log';
 import { PlayerType, User } from '../users';
 import { Maze } from '../maze';
@@ -50,7 +50,11 @@ export class Game extends Model {
     @Column(DataType.ENUM(...Object.values(GameStatus)))
     status: GameStatus;
 
-    @HasOne(() => Maze)
+    @ForeignKey(() => Maze)
+    @Column(DataType.INTEGER)
+    mazeId: number;
+
+    @BelongsTo(() => Maze)
     maze: Maze;
 
     @HasMany(() => GameLog)

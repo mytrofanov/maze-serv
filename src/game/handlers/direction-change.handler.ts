@@ -55,10 +55,18 @@ export const handleDirectionChange =
             message,
         );
 
-        await mazeService.handleDirectionChange(gameId, direction, startPosition, updatedPosition, playerType);
+        await mazeService.handleDirectionChange(
+            game.id,
+            game.mazeId,
+            direction,
+            startPosition.y,
+            startPosition.x,
+            updatedPosition,
+            playerType,
+        );
 
         const updatedGameState = await gameService.togglePlayer(gameId);
-        const updatedMaze = await mazeCellService.getMazeById(gameId);
+        const updatedMaze = await mazeService.getMazeById(gameId);
 
         const allLogs = await logService.getGameLogs(gameId);
         server.emit(SocketEvents.LOG_UPDATED, allLogs);
