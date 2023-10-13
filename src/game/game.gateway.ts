@@ -3,7 +3,7 @@ import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 import { GameLogService } from '../game-log/game-log.service';
-import { MazeCellService } from '../cell/cell.service';
+import { MazeCellService } from '../cell';
 import { DirectionPayload, GameExitPayload, GiveUpPayload, MessagePayload, SocketEvents } from './socket-types';
 import * as process from 'process';
 import 'dotenv/config';
@@ -18,6 +18,8 @@ import {
     handleGiveUp,
 } from './handlers';
 import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
+import { RowService } from '../row';
+import { MazeService } from '../maze';
 
 @WebSocketGateway({
     cors: {
@@ -34,6 +36,8 @@ export class GameGateway implements OnGatewayConnection {
         private readonly usersService: UsersService,
         private readonly logService: GameLogService,
         private readonly mazeCellService: MazeCellService,
+        private readonly rowService: RowService,
+        private readonly mazeService: MazeService,
     ) {}
 
     //CONNECTION
