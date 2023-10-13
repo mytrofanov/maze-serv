@@ -3,6 +3,7 @@ import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from '
 import { Maze } from '../maze';
 import { MazeCell } from '../cell';
 import { PlayerType } from '../users';
+import { forwardRef } from '@nestjs/common';
 
 @Table({ tableName: 'Row', timestamps: true })
 export class Row extends Model {
@@ -22,6 +23,6 @@ export class Row extends Model {
     @Column({ type: DataType.ENUM, values: Object.values(PlayerType), allowNull: true })
     player?: PlayerType;
 
-    @HasMany(() => MazeCell)
+    @HasMany(() => forwardRef(() => MazeCell) as any)
     cells: MazeCell[];
 }

@@ -7,7 +7,11 @@ import { Maze } from '../maze';
 
 @Injectable()
 export class RowService {
-    constructor(@InjectModel(Row) private readonly rowModel: typeof Row) {}
+    constructor(
+        @InjectModel(Row)
+        private readonly rowModel: typeof Row,
+        @InjectModel(MazeCell) private readonly mazeCellModel: typeof MazeCell,
+    ) {}
 
     async findRowWithPlayer(gameId: number, player: PlayerType): Promise<Row | null> {
         return await this.rowModel.findOne({
@@ -19,7 +23,7 @@ export class RowService {
                     where: { gameId: gameId },
                 },
                 {
-                    model: MazeCell,
+                    model: this.mazeCellModel,
                     as: 'cells',
                     where: { player: player },
                 },

@@ -1,10 +1,11 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Row } from './row.model';
 import { RowService } from './row.service';
+import { MazeCellModule } from '../cell';
 
 @Module({
-    imports: [SequelizeModule.forFeature([Row])],
+    imports: [SequelizeModule.forFeature([Row]), forwardRef(() => MazeCellModule)],
     providers: [RowService],
     exports: [RowService],
 })

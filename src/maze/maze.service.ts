@@ -50,7 +50,7 @@ export class MazeService {
         const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
         const createdMaze = await this.mazeModel.create({ gameId });
 
-        // Iterate through the matrix to create Rows and MazeCells.
+        // Iterate through the randomMazeData to create Rows and MazeCells.
         for (let y = 0; y < randomMazeData.length; y++) {
             const row = randomMazeData[y];
 
