@@ -33,14 +33,14 @@ export const handleDirectionChange =
 
         //FIND PLAYER
         const playerType = playerId === game.player1Id ? PlayerType.PLAYER1 : PlayerType.PLAYER2;
-        const startPosition = await mazeService.findPlayerPosition(game.id, playerType);
+        const startPosition = await mazeService.findPlayerPosition(game, playerType);
         if (!startPosition) {
             client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.PLAYER_IS_NOT_FOUND,
                 message: 'Player is not found on the maze',
             });
         }
-
+        console.log('startPosition: ', startPosition);
         //FIND NEXT POSITION
         const updatedPosition = newPosition(direction, { x: startPosition.x.colX, y: startPosition.y.rowY });
 

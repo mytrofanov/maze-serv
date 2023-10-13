@@ -2,7 +2,6 @@ import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from '
 
 import { Maze } from '../maze/maze.model';
 import { MazeCell } from '../cell/cell.model';
-import { PlayerType } from '../users';
 
 @Table({ tableName: 'Row', timestamps: true })
 export class Row extends Model {
@@ -19,8 +18,11 @@ export class Row extends Model {
     @BelongsTo(() => Maze)
     maze: Maze;
 
-    @Column({ type: DataType.ENUM, values: Object.values(PlayerType), allowNull: true })
-    player?: PlayerType;
+    @Column({ type: DataType.BOOLEAN })
+    player1onRow: boolean;
+
+    @Column({ type: DataType.BOOLEAN })
+    player2onRow: boolean;
 
     @HasMany(() => MazeCell)
     cells: MazeCell[];

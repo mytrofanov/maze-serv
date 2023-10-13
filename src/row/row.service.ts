@@ -11,12 +11,24 @@ export class RowService {
     ) {}
 
     async findRowWithPlayer(mazeId: number, player: PlayerType): Promise<Row | null> {
-        return await this.rowModel.findOne({
-            where: {
-                mazeId: mazeId,
-                player: player,
-            },
-        });
+        const player1 = player === PlayerType.PLAYER1;
+        const player2 = player === PlayerType.PLAYER2;
+        if (player1) {
+            return await this.rowModel.findOne({
+                where: {
+                    mazeId: mazeId,
+                    player1onRow: player1,
+                },
+            });
+        }
+        if (player2) {
+            return await this.rowModel.findOne({
+                where: {
+                    mazeId: mazeId,
+                    player2onRow: player2,
+                },
+            });
+        }
     }
 
     async findRowByYAndMazeId(y: number, mazeId: number): Promise<Row | null> {

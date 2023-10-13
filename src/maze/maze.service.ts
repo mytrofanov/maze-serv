@@ -3,10 +3,11 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Cell, Direction, MazeCell, Position } from '../cell/cell.model';
 import { MazeCellService } from '../cell/cell.service';
 import { Mazes } from '../lib/mazes';
-import { GameService } from '../game';
+import { Game, GameService } from '../game';
 import { PlayerType } from '../users';
 import { Row, RowService } from '../row';
 import { Maze } from './maze.model';
+import { checkCellsForPlayer } from '../utils/check-cells-for-player';
 
 @Injectable()
 export class MazeService {
@@ -59,6 +60,8 @@ export class MazeService {
             const createdRow = await this.rowService.createRow({
                 rowY: y,
                 mazeId: createdMaze.id,
+                player1onRow: checkCellsForPlayer(row, PlayerType.PLAYER1),
+                player2onRow: checkCellsForPlayer(row, PlayerType.PLAYER2),
             });
 
             for (let x = 0; x < row.length; x++) {
@@ -80,29 +83,22 @@ export class MazeService {
         return this.getMazeById(createdMaze.id);
     }
 
-    async findPlayerPosition(gameId: number, player: PlayerType): Promise<{ y: Row; x: MazeCell } | null> {
-        const game = await this.gameService.findGame(gameId);
-        if (!game) {
-            throw new NotFoundException(`No game found with id:${gameId} `);
-        }
+    async findPlayerPosition(game: Game, player: PlayerType): Promise<{ y: Row; x: MazeCell } | null> {
+        // const game = await this.gameService.findGame(gameId);
+        // if (!game) {
+        //     throw new NotFoundException(`No game found with id:${gameId} `);
+        // }
         // Find the Row containing the player using RowService.
+        console.log('game.mazeId: ', game.mazeId, ', player: ', player);
+        // console.log('game.maze: ', game.maze);
         const foundRow = await this.rowService.findRowWithPlayer(game.mazeId, player);
+        console.log('foundRow: ', foundRow);
+        const foundCell = await this.cellService.findCell({
+            player: player,
+            rowId: foundRow.id,
+        });
 
-        // If Row is found, find the MazeCell containing the player.
-        if (foundRow) {
-            const foundCell = await this.cellService.findCell({
-                player: player,
-                rowId: foundRow.id,
-            });
-
-            // If MazeCell is found, return the ids
-            if (foundCell) {
-                return { y: foundRow, x: foundCell };
-            }
-        }
-
-        // If nothing is found, return null.
-        return null;
+        return { y: foundRow, x: foundCell };
     }
 
     async handleDirectionChange(
@@ -116,6 +112,8 @@ export class MazeService {
     ) {
         const newRow = await this.rowService.findRowByYAndMazeId(updatedPosition.y, mazeId);
         const newCell = await this.cellService.findCellByXAndRowId(updatedPosition.x, newRow.id);
+        const player1 = currentPlayer === PlayerType.PLAYER1;
+        const player2 = currentPlayer === PlayerType.PLAYER2;
 
         if (!newRow || !newCell) {
             throw new NotFoundException(
@@ -131,28 +129,35 @@ export class MazeService {
                 );
             }
             //move player to new row
-            // newRow.player = currentPlayer;
-            await this.rowService.updateRow(newRow.id, { player: currentPlayer });
-            // await newRow.save();
+            if (player1) {
+                await this.rowService.updateRow(newRow.id, {
+                    player1onRow: player1,
+                });
+            }
+            if (player2) {
+                await this.rowService.updateRow(newRow.id, {
+                    player2onRow: player2,
+                });
+            }
 
             //move player to new cell
-            // newCell.revealed = true;
-            // newCell.player = currentPlayer;
             await this.cellService.updateCell(newCell.id, { revealed: true, player: currentPlayer });
-            // await newCell.save();
-            // console.log('newCell: ', newCell);
 
             //clear prev row
             // prevRow.player = null;
-            // await prevRow.save();
-            await this.rowService.updateRow(prevRow.id, { player: null });
+            if (player1) {
+                await this.rowService.updateRow(prevRow.id, {
+                    player1onRow: !player1,
+                });
+            }
+            if (player2) {
+                await this.rowService.updateRow(prevRow.id, {
+                    player1onRow: !player2,
+                });
+            }
 
             //clear prev cell
-            // prevCell.revealed = true;
-            // prevCell.player = null;
-            // prevCell.direction = direction;
             await this.cellService.updateCell(prevCell.id, { revealed: true, player: null, direction: direction });
-            // await prevCell.save();
         }
         //if wall
         // newCell.revealed = true;

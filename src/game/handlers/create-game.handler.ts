@@ -9,14 +9,18 @@ export const handleCreateGame =
     async (client: any, payload: CreateGameDto): Promise<any> => {
         const newGame = await gameService.createGame(payload);
         const newMaze = await mazeService.createRandomMaze(newGame.id);
+        const gameWithMaze = await gameService.updateGame(newGame.id, {
+            mazeId: newMaze.id,
+            maze: newMaze,
+        });
 
-        if (!newGame || !newMaze) {
+        if (!gameWithMaze || !newMaze) {
             client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.GAME_NOT_CREATED,
                 message: 'Error occurred while creating game',
             });
         } else {
-            client.emit(SocketEvents.GAME_CREATED, { game: newGame, maze: newMaze });
+            client.emit(SocketEvents.GAME_CREATED, { game: gameWithMaze, maze: newMaze });
         }
 
         const availableGames = await gameService.getAvailableGames();

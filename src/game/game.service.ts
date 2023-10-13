@@ -15,12 +15,23 @@ export class GameService {
 
     async createGame(payload: CreateGameDto): Promise<Game> {
         const { player1Id } = payload;
-        await this.usersService.updateUser(player1Id, { type: PlayerType.PLAYER1 });
-        return await this.gameModel.create({
-            player1Id,
+        const player1 = await this.usersService.updateUser(player1Id, { type: PlayerType.PLAYER1 });
+        const newGame = await this.gameModel.create({
+            player1Id: player1.id,
             status: GameStatus.WAITING_FOR_PLAYER,
             winner: null,
         });
+
+        return newGame;
+    }
+
+    async updateGame(gameId: number, payload: Partial<Game>): Promise<Game> {
+        const game = await this.gameModel.findByPk(gameId);
+        if (!game) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
+        }
+
+        return game.update(payload);
     }
 
     async getAvailableGames(): Promise<Game[]> {
@@ -40,7 +51,18 @@ export class GameService {
     }
 
     async findGame(gameId: number): Promise<Game> {
-        const game = await this.gameModel.findByPk(gameId);
+        const game = await this.gameModel.findByPk(gameId, {
+            include: [
+                {
+                    model: User,
+                    as: 'player1',
+                },
+                {
+                    model: User,
+                    as: 'player2',
+                },
+            ],
+        });
 
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);
@@ -82,8 +104,8 @@ export class GameService {
 
     async connectToGame(payload: ConnectToGamePayload): Promise<Game> {
         const { gameId, userId } = payload;
-        const game = await this.gameModel.findByPk(gameId);
-        const user = await this.usersService.getUserById(userId);
+        const user = await this.usersService.updateUser(userId, { type: PlayerType.PLAYER2 });
+        const game = await this.findGame(gameId);
 
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);
@@ -95,7 +117,6 @@ export class GameService {
         if (game.status !== GameStatus.WAITING_FOR_PLAYER) {
             throw new ConflictException('The game is either already in progress or completed');
         }
-        await this.usersService.updateUser(user.id, { type: PlayerType.PLAYER2 });
 
         game.player2Id = user.id;
         game.status = GameStatus.IN_PROGRESS;
