@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Cell, Direction, MazeCell, MazeCellService, Position } from '../cell';
-import { MazeMatrixCell, Mazes } from '../lib/mazes';
+import { Mazes } from '../lib/mazes';
 import { GameService } from '../game';
 import { PlayerType } from '../users/users.model';
 import { Row, RowService } from '../row';
@@ -45,19 +45,6 @@ export class MazeService {
 
         return maze;
     }
-
-    // async createRandomMaze(gameId: number): Promise<any> {
-    //     const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
-    //
-    //     if (!randomMazeData) {
-    //         throw new NotFoundException('Maze not found');
-    //     }
-    //
-    //     const cellsData = flattenMaze(randomMazeData, gameId);
-    //
-    //     await this.mazeCellModel.bulkCreate(cellsData);
-    //     return this.getMazeById(gameId);
-    // }
 
     async createRandomMaze(gameId: number): Promise<Maze> {
         const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];

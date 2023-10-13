@@ -54,7 +54,7 @@ export class GameGateway implements OnGatewayConnection {
     //CONNECT_GAME
     @SubscribeMessage(SocketEvents.CONNECT_GAME)
     async handleConnectGame(client: any, payload: ConnectToGamePayloadDto): Promise<any> {
-        await handleConnectGame(this.gameService, this.mazeCellService, this.server)(client, payload);
+        await handleConnectGame(this.gameService, this.mazeService, this.server)(client, payload);
     }
 
     //HANDLE DIRECTION CHANGE
