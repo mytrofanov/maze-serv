@@ -45,4 +45,13 @@ export class RowService {
     async createRow(values: Partial<Row>): Promise<Row | null> {
         return await this.rowModel.create(values);
     }
+
+    async updateRow(rowId: number, changes: Partial<Row>): Promise<Row> {
+        const row = await this.rowModel.findByPk(rowId);
+        if (!row) {
+            throw new NotFoundException(`Row with ID ${rowId} not found`);
+        }
+
+        return row.update(changes);
+    }
 }

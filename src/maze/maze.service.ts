@@ -126,27 +126,32 @@ export class MazeService {
                 );
             }
             //move player to new row
-            newRow.player = currentPlayer;
-            await newRow.save();
+            // newRow.player = currentPlayer;
+            await this.rowService.updateRow(newRow.id, { player: currentPlayer });
+            // await newRow.save();
 
             //move player to new cell
-            newCell.revealed = true;
-            newCell.player = currentPlayer;
-            await newCell.save();
-            console.log('newCell: ', newCell);
+            // newCell.revealed = true;
+            // newCell.player = currentPlayer;
+            await this.cellService.updateCell(newCell.id, { revealed: true, player: currentPlayer });
+            // await newCell.save();
+            // console.log('newCell: ', newCell);
 
             //clear prev row
-            prevRow.player = null;
-            await prevRow.save();
+            // prevRow.player = null;
+            // await prevRow.save();
+            await this.rowService.updateRow(prevRow.id, { player: null });
 
             //clear prev cell
-            prevCell.revealed = true;
-            prevCell.player = null;
-            prevCell.direction = direction;
-            await prevCell.save();
+            // prevCell.revealed = true;
+            // prevCell.player = null;
+            // prevCell.direction = direction;
+            await this.cellService.updateCell(prevCell.id, { revealed: true, player: null, direction: direction });
+            // await prevCell.save();
         }
         //if wall
-        newCell.revealed = true;
-        await newCell.save();
+        // newCell.revealed = true;
+        await this.cellService.updateCell(newCell.id, { revealed: true });
+        // await newCell.save();
     }
 }

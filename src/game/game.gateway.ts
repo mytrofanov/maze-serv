@@ -1,9 +1,8 @@
 import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
-import { UsersService } from '../users/users.service';
-import { GameLogService } from '../game-log/game-log.service';
-import { MazeCellService } from '../cell';
+import { UsersService } from '../users';
+import { GameLogService } from '../game-log';
 import { DirectionPayload, GameExitPayload, GiveUpPayload, MessagePayload, SocketEvents } from './socket-types';
 import * as process from 'process';
 import 'dotenv/config';
@@ -18,7 +17,6 @@ import {
     handleGiveUp,
 } from './handlers';
 import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
-import { RowService } from '../row';
 import { MazeService } from '../maze';
 
 @WebSocketGateway({
@@ -35,8 +33,6 @@ export class GameGateway implements OnGatewayConnection {
         private readonly gameService: GameService,
         private readonly usersService: UsersService,
         private readonly logService: GameLogService,
-        private readonly mazeCellService: MazeCellService,
-        private readonly rowService: RowService,
         private readonly mazeService: MazeService,
     ) {}
 
