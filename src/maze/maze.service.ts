@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Cell, Direction, MazeCell, Position } from '../cell';
+import { Cell, Direction, MazeCell, MazeCellService } from '../cell';
 import { MazeMatrixCell, Mazes } from '../lib/mazes';
 import { GameService } from '../game';
 import { PlayerType } from '../users/users.model';
@@ -11,14 +11,15 @@ import { Maze } from './maze.model';
 @Injectable()
 export class MazeService {
     constructor(
-        @InjectModel(MazeCell)
-        private readonly mazeCellModel: typeof MazeCell,
+        @InjectModel(Maze)
         private readonly mazeModel: typeof Maze,
         @InjectModel(Row) private readonly rowModel: typeof Row,
         @Inject(forwardRef(() => GameService))
         private readonly gameService: GameService,
         @Inject(forwardRef(() => RowService))
         private readonly rowService: RowService,
+        @Inject(forwardRef(() => MazeCellService))
+        private readonly cellService: MazeCellService,
     ) {}
 
     async getMazeById(gameId: number): Promise<Maze | null> {
@@ -47,18 +48,18 @@ export class MazeService {
         return maze;
     }
 
-    async createRandomMaze(gameId: number): Promise<any> {
-        const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
-
-        if (!randomMazeData) {
-            throw new NotFoundException('Maze not found');
-        }
-
-        const cellsData = flattenMaze(randomMazeData, gameId);
-
-        await this.mazeCellModel.bulkCreate(cellsData);
-        return this.getMazeById(gameId);
-    }
+    // async createRandomMaze(gameId: number): Promise<any> {
+    //     const randomMazeData = Mazes[Math.floor(Math.random() * Mazes.length)];
+    //
+    //     if (!randomMazeData) {
+    //         throw new NotFoundException('Maze not found');
+    //     }
+    //
+    //     const cellsData = flattenMaze(randomMazeData, gameId);
+    //
+    //     await this.mazeCellModel.bulkCreate(cellsData);
+    //     return this.getMazeById(gameId);
+    // }
 
     async createMazeFromMatrix(matrix: MazeMatrixCell[][], gameId: number): Promise<Maze> {
         const createdMaze = await this.mazeModel.create({ gameId });
@@ -107,7 +108,7 @@ export class MazeService {
 
             // If MazeCell is found, return the ids
             if (foundCell) {
-                return { y: foundRow.id, x: foundCell.id };
+                return { y: foundRow, x: foundCell };
             }
         }
 
@@ -119,11 +120,16 @@ export class MazeService {
         gameId: number,
         mazeId: number,
         direction: Direction,
-        startPosition: MazeCell,
-        updatedPosition: Position,
+        prevRow: Row,
+        prevCell: Cell,
+        // startPosition: { y: foundRow; x: foundCell },
+        updatedPosition: { x: number; y: number },
         currentPlayer: PlayerType,
-    ) {
-        const prevCell = await this.mazeCellModel.findByPk(startPosition.id);
+
+        const newRow = await this.rowService.findRowByYAndMazeId(updatedPosition.y, mazeId);
+        const newCell = await this.cellService.findCellByXAndRowId(updatedPosition.x, newRow.id);
+
+        //const prevCell = await this.mazeCellModel.findByPk(startPosition.id);
         // const newCell = await this.mazeCellModel.findOne({
         //     where: {
         //         gameId: gameId,

@@ -5,8 +5,8 @@ import { Mazes } from '../lib/mazes';
 import { GameService } from '../game';
 import { PlayerType } from '../users/users.model';
 import { flattenMaze, MazeArrCell, unflattenMaze } from '../utils';
-import { Row } from '../row/row.model';
-import { Maze } from '../maze/maze.model';
+import { Row } from '../row';
+import { Maze } from '../maze';
 
 @Injectable()
 export class MazeCellService {
@@ -52,8 +52,30 @@ export class MazeCellService {
         return this.getMazeById(gameId);
     }
 
+    async findCellByXAndRowId(x: number, rowId: number): Promise<MazeCell | null> {
+        const cell = await this.mazeCellModel.findOne({
+            where: {
+                colX: x,
+                rowId: rowId,
+            },
+        });
+
+        if (!cell) {
+            throw new NotFoundException(`No cell found with X:${x} for RowId:${rowId}.`);
+        }
+
+        return cell;
+    }
+
     // async findPlayerPosition(gameId: number, player: PlayerType): Promise<MazeCell | null> {
     //     const cell = await this.mazeCellModel.findOne({
+    //         include: {
+    //             model: Row,
+    //             where: {
+    //                 gameId: gameId,
+    //                 player: player,
+    //             },
+    //         },
     //         where: {
     //             gameId: gameId,
     //             player: player,
@@ -66,26 +88,6 @@ export class MazeCellService {
     //     return cell;
     // }
 
-    async findPlayerPosition(gameId: number, player: PlayerType): Promise<MazeCell | null> {
-        const cell = await this.mazeCellModel.findOne({
-            include: {
-                model: Row,
-                where: {
-                    gameId: gameId,
-                    player: player,
-                },
-            },
-            where: {
-                gameId: gameId,
-                player: player,
-            },
-        });
-
-        if (!cell) {
-            throw new NotFoundException(`Cell with player ${player} not found in the game with ID ${gameId}`);
-        }
-        return cell;
-    }
     async handleDirectionChange(
         gameId: number,
         mazeId: number,
