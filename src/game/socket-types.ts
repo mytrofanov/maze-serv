@@ -1,5 +1,5 @@
 import { GameStatus } from './game.model';
-import { Direction } from '../cell/cell.model';
+import { Direction } from '../cell';
 import { PlayerType } from '../users/users.model';
 
 export enum SocketEvents {
@@ -67,7 +67,7 @@ export type SocketError = {
     message: string;
 };
 
-export type Game = {
+export type GameSocketType = {
     id: number;
     player1Id: number;
     player2Id?: number;

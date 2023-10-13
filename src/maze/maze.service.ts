@@ -1,15 +1,15 @@
 import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Cell, Direction, MazeCell, Position } from './cell.model';
+import { Cell, Direction, MazeCell, Position } from '../cell';
 import { Mazes } from '../lib/mazes';
 import { GameService } from '../game';
 import { PlayerType } from '../users/users.model';
 import { flattenMaze, MazeArrCell, unflattenMaze } from '../utils';
 import { Row } from '../row/row.model';
-import { Maze } from '../maze/maze.model';
+import { Maze } from './maze.model';
 
 @Injectable()
-export class MazeCellService {
+export class MazeService {
     constructor(
         @InjectModel(MazeCell)
         private readonly mazeCellModel: typeof MazeCell,
