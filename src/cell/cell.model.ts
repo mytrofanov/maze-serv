@@ -1,7 +1,7 @@
 import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { PlayerType } from '../users/users.model';
-import { Row } from '../row/row.model';
-import { Maze } from '../maze/maze.model';
+import { Row } from '../row';
+import { Maze } from '../maze';
 
 export enum Cell {
     WALL = 'WALL',

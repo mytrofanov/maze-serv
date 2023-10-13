@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Cell, Direction, MazeCell, MazeCellService } from '../cell';
+import { Cell, Direction, MazeCell, MazeCellService, Position } from '../cell';
 import { MazeMatrixCell, Mazes } from '../lib/mazes';
 import { GameService } from '../game';
 import { PlayerType } from '../users/users.model';
@@ -78,7 +78,7 @@ export class MazeService {
                 const cellData = row[x];
 
                 // Create a MazeCell instance and associate it with the Row.
-                await this.mazeCellModel.create({
+                await this.cellService.createCell({
                     type: cellData.type,
                     revealed: cellData.revealed,
                     direction: cellData.direction,
@@ -121,40 +121,16 @@ export class MazeService {
         mazeId: number,
         direction: Direction,
         prevRow: Row,
-        prevCell: Cell,
-        // startPosition: { y: foundRow; x: foundCell },
-        updatedPosition: { x: number; y: number },
+        prevCell: MazeCell,
+        updatedPosition: Position,
         currentPlayer: PlayerType,
-
+    ) {
         const newRow = await this.rowService.findRowByYAndMazeId(updatedPosition.y, mazeId);
         const newCell = await this.cellService.findCellByXAndRowId(updatedPosition.x, newRow.id);
 
-        //const prevCell = await this.mazeCellModel.findByPk(startPosition.id);
-        // const newCell = await this.mazeCellModel.findOne({
-        //     where: {
-        //         gameId: gameId,
-        //         colX: updatedPosition.x,
-        //         rowY: updatedPosition.y,
-        //     },
-        // });
-
-        const newCell = await this.mazeCellModel.findOne({
-            include: {
-                model: Row,
-                where: { rowY: updatedPosition.y },
-                include: [
-                    {
-                        model: Maze,
-                        where: { id: mazeId },
-                    },
-                ],
-            },
-            where: { colX: updatedPosition.x },
-        });
-        console.log('found newCell:', newCell);
-        if (!newCell || !prevCell) {
+        if (!newRow || !newCell) {
             throw new NotFoundException(
-                `Cell with position ${updatedPosition} or ${startPosition} not found in the game with ID ${gameId}`,
+                `Cell with position ${updatedPosition.x} or row with position ${updatedPosition.y} not found in the game with ID ${gameId}`,
             );
         }
 
@@ -165,11 +141,19 @@ export class MazeService {
                     currentPlayer === PlayerType.PLAYER1 ? PlayerType.PLAYER1 : PlayerType.PLAYER2,
                 );
             }
+            //move player to new row
+            newRow.player = currentPlayer;
+            await newRow.save();
+
             //move player to new cell
             newCell.revealed = true;
             newCell.player = currentPlayer;
             await newCell.save();
             console.log('newCell: ', newCell);
+
+            //clear prev row
+            prevRow.player = null;
+            await prevRow.save();
 
             //clear prev cell
             prevCell.revealed = true;
