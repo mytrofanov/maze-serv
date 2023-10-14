@@ -1,6 +1,6 @@
 import { SocketErrorCodes, SocketEvents } from '../socket-types';
 import { GameService } from '../game.service';
-import { GameLogService } from '../../game-log';
+import { GameLogService } from '../../game-log/game-log.service';
 import { Server } from 'socket.io';
 import { PlayerType } from '../../users';
 import { newPosition } from '../../utils';

@@ -1,5 +1,5 @@
 import { SocketEvents } from '../socket-types';
-import { GameLogService } from '../../game-log';
+import { GameLogService } from '../../game-log/game-log.service';
 import { Server } from 'socket.io';
 import { LogDto } from '../dtos';
 

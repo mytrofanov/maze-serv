@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { GameGateway } from './game.gateway';
 import { GameService } from './game.service';
-import { GameLog, GameLogModule } from '../game-log';
+import { GameLog } from '../game-log/game-log.model';
+import { GameLogModule } from '../game-log/game-log.module';
 import { Game } from './game.model';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { UsersModule } from '../users';

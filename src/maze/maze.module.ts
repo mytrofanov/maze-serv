@@ -3,7 +3,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { MazeCellModule } from '../cell/cell.module';
 import { Maze } from './maze.model';
 import { MazeService } from './maze.service';
-import { GameModule } from '../game';
+import { GameModule } from '../game/game.module';
 import { RowModule } from '../row/row.module';
 
 @Module({

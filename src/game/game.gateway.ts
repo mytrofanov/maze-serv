@@ -2,7 +2,7 @@ import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServe
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users';
-import { GameLogService } from '../game-log';
+import { GameLogService } from '../game-log/game-log.service';
 import { DirectionPayload, GameExitPayload, GiveUpPayload, MessagePayload, SocketEvents } from './socket-types';
 import * as process from 'process';
 import 'dotenv/config';

@@ -4,7 +4,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import * as path from 'path';
 import { SequelizeModule } from '@nestjs/sequelize';
 import * as process from 'process';
-import { GameModule } from './game';
+import { GameModule } from './game/game.module';
 
 @Module({
     imports: [

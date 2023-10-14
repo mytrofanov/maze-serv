@@ -1,6 +1,6 @@
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from 'sequelize-typescript';
-import { Row } from '../row';
-import { Game } from '../game';
+import { Row } from '../row/row.model';
+import { Game } from '../game/game.model';
 
 @Table({ tableName: 'Maze', timestamps: true })
 export class Maze extends Model {

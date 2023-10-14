@@ -3,11 +3,13 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Cell, Direction, MazeCell, Position } from '../cell/cell.model';
 import { MazeCellService } from '../cell/cell.service';
 import { Mazes } from '../lib/mazes';
-import { Game, GameService } from '../game';
+import { Game } from '../game/game.model';
+import { GameService } from '../game/game.service';
 import { PlayerType } from '../users';
-import { Row, RowService } from '../row';
+import { Row } from '../row/row.model';
+import { RowService } from '../row/row.service';
 import { Maze } from './maze.model';
-import { checkCellsForPlayer } from '../utils/check-cells-for-player';
+import { checkCellsForPlayer } from '../utils';
 
 @Injectable()
 export class MazeService {
