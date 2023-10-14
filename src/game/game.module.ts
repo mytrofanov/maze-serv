@@ -5,7 +5,7 @@ import { GameLog } from '../game-log/game-log.model';
 import { GameLogModule } from '../game-log/game-log.module';
 import { Game } from './game.model';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { UsersModule } from '../users';
+import { UsersModule } from '../users/users.module';
 import { MazeModule } from '../maze/maze.module';
 
 @Module({

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Row } from './row.model';
-import { PlayerType } from '../users';
+import { PlayerType } from '../users/users.model';
 
 @Injectable()
 export class RowService {

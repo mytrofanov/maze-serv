@@ -1,7 +1,7 @@
 import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
-import { UsersService } from '../users';
+import { UsersService } from '../users/users.service';
 import { GameLogService } from '../game-log/game-log.service';
 import { DirectionPayload, GameExitPayload, GiveUpPayload, MessagePayload, SocketEvents } from './socket-types';
 import * as process from 'process';

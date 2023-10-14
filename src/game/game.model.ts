@@ -1,6 +1,6 @@
 import { Model, Column, DataType, Table, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
 import { GameLog } from '../game-log/game-log.model';
-import { PlayerType, User } from '../users';
+import { PlayerType, User } from '../users/users.model';
 import { Maze } from '../maze/maze.model';
 
 export enum GameStatus {

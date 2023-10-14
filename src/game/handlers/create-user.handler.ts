@@ -1,5 +1,5 @@
 import { SocketErrorCodes, SocketEvents, SocketSuccessCodes } from '../socket-types';
-import { UsersService } from '../../users';
+import { UsersService } from '../../users/users.service';
 
 export const handleCreateUser =
     (usersService: UsersService) =>

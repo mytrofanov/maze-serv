@@ -1,5 +1,5 @@
 import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
-import { PlayerType } from '../users';
+import { PlayerType } from '../users/users.model';
 import { Row } from '../row/row.model';
 
 export enum Cell {

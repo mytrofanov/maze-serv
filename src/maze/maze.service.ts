@@ -5,7 +5,7 @@ import { MazeCellService } from '../cell/cell.service';
 import { Mazes } from '../lib/mazes';
 import { Game } from '../game/game.model';
 import { GameService } from '../game/game.service';
-import { PlayerType } from '../users';
+import { PlayerType } from '../users/users.model';
 import { Row } from '../row/row.model';
 import { RowService } from '../row/row.service';
 import { Maze } from './maze.model';

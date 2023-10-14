@@ -2,7 +2,7 @@ import { SocketErrorCodes, SocketEvents } from '../socket-types';
 import { GameService } from '../game.service';
 import { GameLogService } from '../../game-log/game-log.service';
 import { Server } from 'socket.io';
-import { PlayerType } from '../../users';
+import { PlayerType } from '../../users/users.model';
 import { newPosition } from '../../utils';
 import { DirectionDto } from '../dtos';
 import { MazeService } from '../../maze/maze.service';
