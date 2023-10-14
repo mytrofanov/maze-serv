@@ -42,7 +42,6 @@ export class GameService {
                 {
                     model: User,
                     as: 'player1',
-                    attributes: ['userName'],
                 },
             ],
             order: [['id', 'DESC']],
