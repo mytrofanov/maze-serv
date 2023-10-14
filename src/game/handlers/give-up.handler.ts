@@ -1,5 +1,4 @@
 import { SocketEvents } from '../socket-types';
-import { PlayerType } from '../../users/users.model';
 import { GameService } from '../game.service';
 import { Server } from 'socket.io';
 import { GiveUpDto } from '../dtos';
@@ -8,11 +7,7 @@ export const handleGiveUp =
     (gameService: GameService, server: Server) =>
     async (client: any, payload: GiveUpDto): Promise<any> => {
         const { gameId, playerId } = payload;
-        const game = await gameService.findGame(gameId);
-        const updatedGame = await gameService.setWinner(
-            game.id,
-            game.player1Id === playerId ? PlayerType.PLAYER2 : PlayerType.PLAYER1,
-        );
+        const updatedGame = await gameService.setLooser(gameId, playerId);
 
         server.emit(SocketEvents.GAME_UPDATED, { game: updatedGame });
     };

@@ -86,15 +86,12 @@ export class MazeService {
     }
 
     async findPlayerPosition(game: Game, player: PlayerType): Promise<{ y: Row; x: MazeCell } | null> {
-        // const game = await this.gameService.findGame(gameId);
-        // if (!game) {
-        //     throw new NotFoundException(`No game found with id:${gameId} `);
-        // }
-        // Find the Row containing the player using RowService.
         console.log('game.mazeId: ', game.mazeId, ', player: ', player);
-        // console.log('game.maze: ', game.maze);
         const foundRow = await this.rowService.findRowWithPlayer(game.mazeId, player);
         console.log('foundRow: ', foundRow);
+        if (!foundRow) {
+            throw new NotFoundException(`Row on maze ${game.mazeId} with player type: ${player} not found`);
+        }
         const foundCell = await this.cellService.findCell({
             player: player,
             rowId: foundRow.id,
@@ -104,32 +101,28 @@ export class MazeService {
     }
 
     async handleDirectionChange(
-        gameId: number,
-        mazeId: number,
+        game: Game,
         direction: Direction,
         prevRow: Row,
         prevCell: MazeCell,
         updatedPosition: Position,
         currentPlayer: PlayerType,
     ) {
-        console.log('updatedPosition: ', updatedPosition);
-        const newRow = await this.rowService.findRowByYAndMazeId(updatedPosition.y, mazeId);
+        if (game.winner) return;
+        const newRow = await this.rowService.findRowByYAndMazeId(updatedPosition.y, game.mazeId);
         const newCell = await this.cellService.findCellByXAndRowId(updatedPosition.x, newRow.id);
         const isPlayer1 = currentPlayer === PlayerType.PLAYER1;
         const isPlayer2 = currentPlayer === PlayerType.PLAYER2;
 
         if (!newRow || !newCell) {
             throw new NotFoundException(
-                `Cell with position ${updatedPosition.x} or row with position ${updatedPosition.y} not found in the game with ID ${gameId}`,
+                `Cell with position ${updatedPosition.x} or row with position ${updatedPosition.y} not found in the game with ID ${game.id}`,
             );
         }
 
         if (newCell.type !== Cell.WALL) {
             if (newCell.type === Cell.EXIT) {
-                await this.gameService.setWinner(
-                    gameId,
-                    currentPlayer === PlayerType.PLAYER1 ? PlayerType.PLAYER1 : PlayerType.PLAYER2,
-                );
+                await this.gameService.setWinner(game.id, currentPlayer);
             }
             //move player to new row
             await this.rowService.updateRow(newRow.id, {

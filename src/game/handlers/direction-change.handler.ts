@@ -56,8 +56,7 @@ export const handleDirectionChange =
         );
 
         await mazeService.handleDirectionChange(
-            game.id,
-            game.mazeId,
+            game,
             direction,
             startPosition.y,
             startPosition.x,

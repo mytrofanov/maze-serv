@@ -71,7 +71,10 @@ export class GameService {
 
     async togglePlayer(gameId: number): Promise<Game> {
         const game = await this.findGame(gameId);
-
+        if (game.winner) {
+            console.log('GAME IS OVER!');
+            return game;
+        }
         game.currentPlayer = game.currentPlayer === PlayerType.PLAYER1 ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
         await game.save();
         return game;
@@ -88,16 +91,30 @@ export class GameService {
         return game;
     }
 
-    async setWinner(gameId: number, winner: PlayerType): Promise<Game> {
-        const game = await this.gameModel.findByPk(gameId);
+    async setWinner(gameId: number, currentPlayer: PlayerType): Promise<Game> {
+        const game = await this.findGame(gameId);
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);
         }
 
-        game.winner = winner;
-        await game.save();
+        await this.updateGame(game.id, {
+            winner: currentPlayer,
+        });
 
-        return game;
+        return await this.findGame(game.id);
+    }
+
+    async setLooser(gameId: number, looserId: number): Promise<Game> {
+        const game = await this.findGame(gameId);
+        if (!game) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
+        }
+        const isPlayer1Loozer = game.player1Id == looserId;
+        await this.updateGame(game.id, {
+            winner: isPlayer1Loozer ? PlayerType.PLAYER2 : PlayerType.PLAYER1,
+        });
+
+        return await this.findGame(game.id);
     }
 
     async connectToGame(payload: ConnectToGamePayload): Promise<Game> {
