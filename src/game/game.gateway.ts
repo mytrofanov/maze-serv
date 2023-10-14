@@ -19,6 +19,12 @@ import {
 import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
 import { MazeService } from '../maze/maze.service';
 
+export interface PlayerConnection {
+    socketId: string;
+    gameId: number;
+    userId: number;
+}
+
 @WebSocketGateway({
     cors: {
         origin: process.env.CORS_URL,
@@ -35,6 +41,8 @@ export class GameGateway implements OnGatewayConnection {
         private readonly logService: GameLogService,
         private readonly mazeService: MazeService,
     ) {}
+    private connectionToGameMap = new Map<string, string>();
+    private gameToConnectionMap = new Map<string, { player1SocketId: string; player2SocketId: string }>();
 
     //CONNECTION
     async handleConnection(client: any, ...args: any[]) {
@@ -44,12 +52,22 @@ export class GameGateway implements OnGatewayConnection {
     //CREATE_GAME
     @SubscribeMessage(SocketEvents.CREATE_GAME)
     async handleCreateGame(client: any, payload: CreateGameDto): Promise<any> {
+        // SET FIRSTPLAYER CONNECTION INFO
+        // const newGameId = "exampleGameId";
+        // this.connectionToGameMap.set(client.id, newGameId);
+        // this.gameToConnectionMap.set(newGameId, {player1SocketId: client.id, player2SocketId: null});
         await handleCreateGame(this.gameService, this.mazeService, this.server)(client, payload);
     }
 
     //CONNECT_GAME
     @SubscribeMessage(SocketEvents.CONNECT_GAME)
     async handleConnectGame(client: any, payload: ConnectToGamePayloadDto): Promise<any> {
+        // SET SECOND PLAYER CONNECTION INFO
+        // const gameIdToJoin = 'exampleGameId';
+        // this.connectionToGameMap.set(client.id, gameIdToJoin);
+        // const players = this.gameToConnectionMap.get(gameIdToJoin);
+        // this.gameToConnectionMap.set(gameIdToJoin, { ...players, player2SocketId: client.id });
+
         await handleConnectGame(this.gameService, this.mazeService, this.server)(client, payload);
     }
 
@@ -81,5 +99,24 @@ export class GameGateway implements OnGatewayConnection {
     @SubscribeMessage(SocketEvents.CREATE_USER)
     async handleCreateUser(client: any, payload: { userName: string }): Promise<any> {
         await handleCreateUser(this.usersService)(client, payload);
+    }
+
+    async handleDisconnect(client: any): Promise<any> {
+        const gameId = this.connectionToGameMap.get(client.id);
+
+        if (gameId) {
+            const players = this.gameToConnectionMap.get(gameId);
+
+            const opponentSocketId =
+                players.player1SocketId === client.id ? players.player2SocketId : players.player1SocketId;
+
+            if (opponentSocketId) {
+                this.server.to(opponentSocketId).emit(SocketEvents.OPPONENT_DISCONNECTED);
+            }
+
+            // Optional: Remove the games and connections from the maps if they are not needed anymore
+            // this.connectionToGameMap.delete(client.id);
+            // this.gameToConnectionMap.delete(gameId);
+        }
     }
 }
