@@ -116,7 +116,7 @@ export class GameService {
             throw new ConflictException('The game is either already in progress or completed');
         }
 
-        return await game.update(gameId, {
+        return this.updateGame(gameId, {
             player2Id: player2.id,
             player2: player2,
             status: GameStatus.IN_PROGRESS,

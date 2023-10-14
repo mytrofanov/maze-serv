@@ -1,11 +1,9 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { MazeCellModule } from '../cell/cell.module';
-//import { MazeCellService } from '../cell/cell.service';
 import { Maze } from './maze.model';
 import { MazeService } from './maze.service';
 import { GameModule } from '../game';
-// import { RowService } from '../row';
 import { RowModule } from '../row/row.module';
 
 @Module({
