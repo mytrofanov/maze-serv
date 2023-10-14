@@ -112,8 +112,8 @@ export class MazeService {
     ) {
         const newRow = await this.rowService.findRowByYAndMazeId(updatedPosition.y, mazeId);
         const newCell = await this.cellService.findCellByXAndRowId(updatedPosition.x, newRow.id);
-        const player1 = currentPlayer === PlayerType.PLAYER1;
-        const player2 = currentPlayer === PlayerType.PLAYER2;
+        const isPlayer1 = currentPlayer === PlayerType.PLAYER1;
+        const isPlayer2 = currentPlayer === PlayerType.PLAYER2;
 
         if (!newRow || !newCell) {
             throw new NotFoundException(
@@ -129,14 +129,17 @@ export class MazeService {
                 );
             }
             //move player to new row
-            if (player1) {
+            await this.rowService.updateRow(newRow.id, {
+                player1onRow: isPlayer1,
+            });
+            if (isPlayer1) {
                 await this.rowService.updateRow(newRow.id, {
-                    player1onRow: player1,
+                    player1onRow: isPlayer1,
                 });
             }
-            if (player2) {
+            if (isPlayer2) {
                 await this.rowService.updateRow(newRow.id, {
-                    player2onRow: player2,
+                    player2onRow: isPlayer2,
                 });
             }
 
@@ -145,14 +148,14 @@ export class MazeService {
 
             //clear prev row
             // prevRow.player = null;
-            if (player1) {
+            if (isPlayer1) {
                 await this.rowService.updateRow(prevRow.id, {
-                    player1onRow: !player1,
+                    player1onRow: !isPlayer1,
                 });
             }
-            if (player2) {
+            if (isPlayer2) {
                 await this.rowService.updateRow(prevRow.id, {
-                    player1onRow: !player2,
+                    player2onRow: !isPlayer2,
                 });
             }
 
