@@ -33,11 +33,13 @@ export class MazeService {
                         {
                             model: MazeCell,
                             as: 'cells',
-                            order: [['colX', 'ASC']],
                         },
                     ],
-                    order: [['rowY', 'ASC']],
                 },
+            ],
+            order: [
+                [{ model: Row, as: 'rows' }, 'id', 'ASC'],
+                [{ model: Row, as: 'rows' }, { model: MazeCell, as: 'cells' }, 'id', 'ASC'],
             ],
         });
 
@@ -110,6 +112,7 @@ export class MazeService {
         updatedPosition: Position,
         currentPlayer: PlayerType,
     ) {
+        console.log('updatedPosition: ', updatedPosition);
         const newRow = await this.rowService.findRowByYAndMazeId(updatedPosition.y, mazeId);
         const newCell = await this.cellService.findCellByXAndRowId(updatedPosition.x, newRow.id);
         const isPlayer1 = currentPlayer === PlayerType.PLAYER1;
@@ -147,13 +150,12 @@ export class MazeService {
             await this.cellService.updateCell(newCell.id, { revealed: true, player: currentPlayer });
 
             //clear prev row
-            // prevRow.player = null;
-            if (isPlayer1) {
+            if (isPlayer1 && newRow.id !== prevRow.id) {
                 await this.rowService.updateRow(prevRow.id, {
                     player1onRow: !isPlayer1,
                 });
             }
-            if (isPlayer2) {
+            if (isPlayer2 && newRow.id !== prevRow.id) {
                 await this.rowService.updateRow(prevRow.id, {
                     player2onRow: !isPlayer2,
                 });

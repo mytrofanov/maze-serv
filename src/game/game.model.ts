@@ -22,14 +22,14 @@ export class Game extends Model {
     @Column({ type: DataType.INTEGER, allowNull: false })
     player1Id: number;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, { foreignKey: 'player1Id', as: 'player1' })
     player1: User;
 
     @ForeignKey(() => User)
     @Column({ type: DataType.INTEGER, allowNull: true })
     player2Id?: number;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, { foreignKey: 'player2Id', as: 'player2' })
     player2: User;
 
     @Column({

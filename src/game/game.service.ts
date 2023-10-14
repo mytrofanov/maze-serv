@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Game, GameStatus } from './game.model';
 import { ConnectToGamePayload } from './socket-types';
@@ -102,24 +102,29 @@ export class GameService {
 
     async connectToGame(payload: ConnectToGamePayload): Promise<Game> {
         const { gameId, userId } = payload;
-        const player2 = await this.usersService.updateUser(userId, { type: PlayerType.PLAYER2 });
-        const game = await this.gameModel.findByPk(gameId);
 
-        if (!game) {
-            throw new NotFoundException(`Game with ID ${gameId} not found`);
-        }
+        const player2 = await this.usersService.updateUser(userId, { type: PlayerType.PLAYER2 });
+
         if (!player2) {
             throw new NotFoundException(`User with ID ${userId} not found`);
         }
 
-        if (game.status !== GameStatus.WAITING_FOR_PLAYER) {
-            throw new ConflictException('The game is either already in progress or completed');
+        await this.gameModel.update(
+            { player2Id: player2.id, status: GameStatus.IN_PROGRESS },
+            { where: { id: gameId } },
+        );
+
+        const updatedGame = await this.gameModel.findByPk(gameId, {
+            include: [
+                { model: User, as: 'player1' },
+                { model: User, as: 'player2' },
+            ],
+        });
+
+        if (!updatedGame) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
         }
 
-        return this.updateGame(gameId, {
-            player2Id: player2.id,
-            player2: player2,
-            status: GameStatus.IN_PROGRESS,
-        });
+        return updatedGame;
     }
 }
