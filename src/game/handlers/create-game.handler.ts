@@ -3,6 +3,7 @@ import { GameService } from '../game.service';
 import { Server } from 'socket.io';
 import { CreateGameDto } from '../dtos';
 import { MazeService } from '../../maze/maze.service';
+import { saveConnectionInfoOnGameCreate } from '../../utils';
 
 export const handleCreateGame =
     (gameService: GameService, mazeService: MazeService, server: Server) =>
@@ -22,6 +23,9 @@ export const handleCreateGame =
         } else {
             client.emit(SocketEvents.GAME_CREATED, { game: gameWithMaze, maze: newMaze });
         }
+
+        // SAVE FIRSTPLAYER CONNECTION INFO
+        saveConnectionInfoOnGameCreate(client.id, newGame.id.toString());
 
         const availableGames = await gameService.getAvailableGames();
         server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);

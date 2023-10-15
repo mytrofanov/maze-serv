@@ -49,25 +49,15 @@ export class GameGateway implements OnGatewayConnection {
         await handleConnection(this.gameService, this.usersService, this.server)(client, ...args);
     }
 
-    //CREATE_GAME
+    //CREATE_GAME AND SAVE CONNECTION INFO
     @SubscribeMessage(SocketEvents.CREATE_GAME)
     async handleCreateGame(client: any, payload: CreateGameDto): Promise<any> {
-        // SET FIRSTPLAYER CONNECTION INFO
-        // const newGameId = "exampleGameId";
-        // this.connectionToGameMap.set(client.id, newGameId);
-        // this.gameToConnectionMap.set(newGameId, {player1SocketId: client.id, player2SocketId: null});
         await handleCreateGame(this.gameService, this.mazeService, this.server)(client, payload);
     }
 
-    //CONNECT_GAME
+    //CONNECT_GAME AND SAVE CONNECTION INFO
     @SubscribeMessage(SocketEvents.CONNECT_GAME)
     async handleConnectGame(client: any, payload: ConnectToGamePayloadDto): Promise<any> {
-        // SET SECOND PLAYER CONNECTION INFO
-        // const gameIdToJoin = 'exampleGameId';
-        // this.connectionToGameMap.set(client.id, gameIdToJoin);
-        // const players = this.gameToConnectionMap.get(gameIdToJoin);
-        // this.gameToConnectionMap.set(gameIdToJoin, { ...players, player2SocketId: client.id });
-
         await handleConnectGame(this.gameService, this.mazeService, this.server)(client, payload);
     }
 
