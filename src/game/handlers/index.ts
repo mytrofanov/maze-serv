@@ -5,4 +5,5 @@ export * from './direction-change.handler';
 export * from './create-log.handlers';
 export * from './give-up.handler';
 export * from './exit.handler';
+export * from './disconnect.handler';
 export * from './create-user.handler';

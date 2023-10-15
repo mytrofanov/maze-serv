@@ -1,4 +1,10 @@
-import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer,
+} from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
@@ -7,6 +13,7 @@ import { DirectionPayload, GameExitPayload, GiveUpPayload, MessagePayload, Socke
 import * as process from 'process';
 import 'dotenv/config';
 import {
+    sendMessageToOpponent,
     handleConnectGame,
     handleConnection,
     handleCreateGame,
@@ -18,7 +25,6 @@ import {
 } from './handlers';
 import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
 import { MazeService } from '../maze/maze.service';
-import { getClientWithDisconnectedOpponent } from '../utils';
 
 @WebSocketGateway({
     cors: {
@@ -26,7 +32,7 @@ import { getClientWithDisconnectedOpponent } from '../utils';
         credentials: true,
     },
 }) // can choose port @WebSocketGateway(4001), for example
-export class GameGateway implements OnGatewayConnection {
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
@@ -84,10 +90,8 @@ export class GameGateway implements OnGatewayConnection {
         await handleCreateUser(this.usersService)(client, payload);
     }
 
+    //DISCONNECT HANDLER
     async handleDisconnect(client: any): Promise<any> {
-        const opponentSocketId = getClientWithDisconnectedOpponent(client.id);
-        if (opponentSocketId) {
-            this.server.to(opponentSocketId).emit(SocketEvents.OPPONENT_DISCONNECTED);
-        }
+        await sendMessageToOpponent(this.server)(client);
     }
 }
