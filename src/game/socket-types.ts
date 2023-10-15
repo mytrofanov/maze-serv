@@ -4,6 +4,7 @@ import { PlayerType } from '../users/users.model';
 
 export enum SocketEvents {
     AVAILABLE_GAMES = 'AVAILABLE_GAMES',
+    COMPLETED_GAMES = 'COMPLETED_GAMES',
     CONNECT = 'CONNECT',
     RECONNECT = 'RECONNECT',
     CONNECT_GAME = 'CONNECT_GAME',

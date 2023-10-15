@@ -57,6 +57,9 @@ export class Game extends Model {
     @BelongsTo(() => Maze)
     maze: Maze;
 
+    @Column({ type: DataType.JSONB, allowNull: true })
+    initialMaze: any;
+
     @HasMany(() => GameLog)
     logs: GameLog[];
 }
