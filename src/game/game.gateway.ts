@@ -18,12 +18,7 @@ import {
 } from './handlers';
 import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
 import { MazeService } from '../maze/maze.service';
-
-export interface PlayerConnection {
-    socketId: string;
-    gameId: number;
-    userId: number;
-}
+import { getClientWithDisconnectedOpponent } from '../utils';
 
 @WebSocketGateway({
     cors: {
@@ -41,8 +36,6 @@ export class GameGateway implements OnGatewayConnection {
         private readonly logService: GameLogService,
         private readonly mazeService: MazeService,
     ) {}
-    private connectionToGameMap = new Map<string, string>();
-    private gameToConnectionMap = new Map<string, { player1SocketId: string; player2SocketId: string }>();
 
     //CONNECTION
     async handleConnection(client: any, ...args: any[]) {
@@ -92,21 +85,9 @@ export class GameGateway implements OnGatewayConnection {
     }
 
     async handleDisconnect(client: any): Promise<any> {
-        const gameId = this.connectionToGameMap.get(client.id);
-
-        if (gameId) {
-            const players = this.gameToConnectionMap.get(gameId);
-
-            const opponentSocketId =
-                players.player1SocketId === client.id ? players.player2SocketId : players.player1SocketId;
-
-            if (opponentSocketId) {
-                this.server.to(opponentSocketId).emit(SocketEvents.OPPONENT_DISCONNECTED);
-            }
-
-            // Optional: Remove the games and connections from the maps if they are not needed anymore
-            // this.connectionToGameMap.delete(client.id);
-            // this.gameToConnectionMap.delete(gameId);
+        const opponentSocketId = getClientWithDisconnectedOpponent(client.id);
+        if (opponentSocketId) {
+            this.server.to(opponentSocketId).emit(SocketEvents.OPPONENT_DISCONNECTED);
         }
     }
 }

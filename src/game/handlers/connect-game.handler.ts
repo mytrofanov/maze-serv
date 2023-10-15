@@ -17,11 +17,7 @@ export const handleConnectGame =
                 message: 'Error occurred while connecting to game',
             });
         } else {
-            // SET SECOND PLAYER CONNECTION INFO
-            // const gameIdToJoin = 'exampleGameId';
-            // this.connectionToGameMap.set(client.id, gameIdToJoin);
-            // const players = this.gameToConnectionMap.get(gameIdToJoin);
-            // this.gameToConnectionMap.set(gameIdToJoin, { ...players, player2SocketId: client.id });
+            // SAVE SECOND PLAYER CONNECTION INFO
             saveConnectionInfoOnGameConnect(client.id, connectedGame.id.toString());
 
             server.emit(SocketEvents.GAME_UPDATED, { game: connectedGame, maze: maze });

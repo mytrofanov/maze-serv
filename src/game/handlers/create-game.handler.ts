@@ -24,7 +24,7 @@ export const handleCreateGame =
             client.emit(SocketEvents.GAME_CREATED, { game: gameWithMaze, maze: newMaze });
         }
 
-        // SAVE FIRSTPLAYER CONNECTION INFO
+        // SAVE FIRST PLAYER CONNECTION INFO
         saveConnectionInfoOnGameCreate(client.id, newGame.id.toString());
 
         const availableGames = await gameService.getAvailableGames();
