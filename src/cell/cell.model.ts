@@ -1,6 +1,6 @@
-import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
-import { Game } from '../game/game.model';
+import { Table, Column, Model, DataType, BelongsTo, ForeignKey } from 'sequelize-typescript';
 import { PlayerType } from '../users/users.model';
+import { Row } from '../row/row.model';
 
 export enum Cell {
     WALL = 'WALL',
@@ -22,18 +22,8 @@ export type Position = {
 
 @Table({ tableName: 'MazeCell', timestamps: true })
 export class MazeCell extends Model {
-    @Column({ type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
+    @Column({ type: DataType.INTEGER, autoIncrement: true, primaryKey: true })
     id: number;
-
-    @ForeignKey(() => Game)
-    @Column({ type: DataType.INTEGER })
-    gameId: number;
-
-    @BelongsTo(() => Game)
-    game: Game;
-
-    @Column({ type: DataType.INTEGER })
-    rowY: number;
 
     @Column({ type: DataType.INTEGER })
     colX: number;
@@ -49,4 +39,11 @@ export class MazeCell extends Model {
 
     @Column({ type: DataType.ENUM, values: Object.values(PlayerType), allowNull: true })
     player?: PlayerType;
+
+    @ForeignKey(() => Row)
+    @Column({ type: DataType.INTEGER })
+    rowId: number;
+
+    @BelongsTo(() => Row)
+    row: Row;
 }

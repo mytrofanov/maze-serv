@@ -1,7 +1,7 @@
 import { Model, Column, DataType, Table, ForeignKey, BelongsTo, HasMany } from 'sequelize-typescript';
-import { MazeCell } from '../cell/cell.model';
 import { GameLog } from '../game-log/game-log.model';
 import { PlayerType, User } from '../users/users.model';
+import { Maze } from '../maze/maze.model';
 
 export enum GameStatus {
     WAITING_FOR_PLAYER = 'WAITING_FOR_PLAYER',
@@ -22,14 +22,14 @@ export class Game extends Model {
     @Column({ type: DataType.INTEGER, allowNull: false })
     player1Id: number;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, { foreignKey: 'player1Id', as: 'player1' })
     player1: User;
 
     @ForeignKey(() => User)
     @Column({ type: DataType.INTEGER, allowNull: true })
     player2Id?: number;
 
-    @BelongsTo(() => User)
+    @BelongsTo(() => User, { foreignKey: 'player2Id', as: 'player2' })
     player2: User;
 
     @Column({
@@ -50,8 +50,12 @@ export class Game extends Model {
     @Column(DataType.ENUM(...Object.values(GameStatus)))
     status: GameStatus;
 
-    @HasMany(() => MazeCell)
-    cells: MazeCell[];
+    @ForeignKey(() => Maze)
+    @Column(DataType.INTEGER)
+    mazeId: number;
+
+    @BelongsTo(() => Maze)
+    maze: Maze;
 
     @HasMany(() => GameLog)
     logs: GameLog[];

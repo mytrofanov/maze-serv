@@ -17,6 +17,7 @@ export enum SocketEvents {
     GAME_UPDATED = 'GAME_UPDATED',
     GIVE_UP = 'GIVE_UP',
     LOG_UPDATED = 'LOG_UPDATED',
+    OPPONENT_DISCONNECTED = 'OPPONENT_DISCONNECTED',
     SEND_MESSAGE = 'SEND_MESSAGE',
     SUCCESS = 'SUCCESS',
 }
@@ -67,7 +68,7 @@ export type SocketError = {
     message: string;
 };
 
-export type Game = {
+export type GameSocketType = {
     id: number;
     player1Id: number;
     player2Id?: number;

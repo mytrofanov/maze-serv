@@ -1,13 +1,7 @@
 import { Cell, Direction } from '../cell/cell.model';
 import { PlayerType } from '../users/users.model';
 
-// export enum Cell {
-//     WALL = 1,
-//     PATH = 0,
-//     EXIT = -1,
-// }
-
-export type MazeCell = {
+export type MazeMatrixCell = {
     type: Cell;
     revealed: boolean;
     direction?: Direction;
@@ -16,42 +10,42 @@ export type MazeCell = {
     colX?: number;
 };
 
-const wall: MazeCell = {
+const wall: MazeMatrixCell = {
     type: Cell.WALL,
     revealed: false,
     direction: undefined,
     player: undefined,
 };
 
-const path: MazeCell = {
+const path: MazeMatrixCell = {
     type: Cell.PATH,
     revealed: false,
     direction: undefined,
     player: undefined,
 };
 
-const exit: MazeCell = {
+const exit: MazeMatrixCell = {
     type: Cell.EXIT,
     revealed: false,
     direction: undefined,
     player: undefined,
 };
 
-const startFirst: MazeCell = {
+const startFirst: MazeMatrixCell = {
     type: Cell.PATH,
     revealed: true,
     direction: undefined,
     player: PlayerType.PLAYER1,
 };
 
-const startSecond: MazeCell = {
+const startSecond: MazeMatrixCell = {
     type: Cell.PATH,
     revealed: true,
     direction: undefined,
     player: PlayerType.PLAYER2,
 };
 
-export const newMaze: MazeCell[][] = [
+export const newMaze: MazeMatrixCell[][] = [
     [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
     [wall, startFirst, path, path, wall, startSecond, path, path, path, wall],
     [wall, wall, wall, path, wall, wall, path, wall, wall, wall],
@@ -64,7 +58,7 @@ export const newMaze: MazeCell[][] = [
     [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
 ];
 
-const newMazeA: MazeCell[][] = [
+const newMazeA: MazeMatrixCell[][] = [
     [wall, wall, wall, exit, wall, wall, wall, wall, wall, wall],
     [wall, path, path, path, path, path, path, path, path, wall],
     [wall, wall, wall, path, wall, wall, path, wall, wall, wall],
@@ -77,7 +71,7 @@ const newMazeA: MazeCell[][] = [
     [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
 ];
 
-const newMazeB: MazeCell[][] = [
+const newMazeB: MazeMatrixCell[][] = [
     [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
     [wall, path, path, startFirst, path, path, path, path, path, wall],
     [wall, wall, wall, path, wall, wall, path, wall, wall, wall],
@@ -90,7 +84,7 @@ const newMazeB: MazeCell[][] = [
     [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
 ];
 
-const newMazeC: MazeCell[][] = [
+const newMazeC: MazeMatrixCell[][] = [
     [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
     [wall, path, path, startFirst, path, path, path, path, path, wall],
     [wall, wall, wall, path, wall, wall, path, wall, wall, wall],
@@ -103,7 +97,7 @@ const newMazeC: MazeCell[][] = [
     [wall, wall, wall, wall, wall, wall, exit, wall, wall, wall],
 ];
 
-const newMazeD: MazeCell[][] = [
+const newMazeD: MazeMatrixCell[][] = [
     [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
     [wall, path, path, path, path, path, path, path, path, wall],
     [wall, wall, wall, path, wall, wall, path, wall, wall, wall],

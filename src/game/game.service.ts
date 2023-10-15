@@ -1,9 +1,8 @@
-import { ConflictException, forwardRef, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Game, GameStatus } from './game.model';
-import { MazeCellService } from '../cell/cell.service';
-import { UsersService } from '../users/users.service';
 import { ConnectToGamePayload } from './socket-types';
+import { UsersService } from '../users/users.service';
 import { PlayerType, User } from '../users/users.model';
 import { CreateGameDto } from './dtos';
 
@@ -12,19 +11,27 @@ export class GameService {
     constructor(
         @InjectModel(Game)
         private readonly gameModel: typeof Game,
-        @Inject(forwardRef(() => MazeCellService))
-        private readonly mazeCellService: MazeCellService,
         private readonly usersService: UsersService,
     ) {}
 
     async createGame(payload: CreateGameDto): Promise<Game> {
         const { player1Id } = payload;
-
+        const player1 = await this.usersService.updateUser(player1Id, { type: PlayerType.PLAYER1 });
         return await this.gameModel.create({
-            player1Id,
+            player1Id: player1.id,
+            player1: player1,
             status: GameStatus.WAITING_FOR_PLAYER,
             winner: null,
         });
+    }
+
+    async updateGame(gameId: number, payload: Partial<Game>): Promise<Game> {
+        const game = await this.gameModel.findByPk(gameId);
+        if (!game) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
+        }
+
+        return game.update(payload);
     }
 
     async getAvailableGames(): Promise<Game[]> {
@@ -36,7 +43,6 @@ export class GameService {
                 {
                     model: User,
                     as: 'player1',
-                    attributes: ['userName'],
                 },
             ],
             order: [['id', 'DESC']],
@@ -44,7 +50,18 @@ export class GameService {
     }
 
     async findGame(gameId: number): Promise<Game> {
-        const game = await this.gameModel.findByPk(gameId);
+        const game = await this.gameModel.findByPk(gameId, {
+            include: [
+                {
+                    model: User,
+                    as: 'player1',
+                },
+                {
+                    model: User,
+                    as: 'player2',
+                },
+            ],
+        });
 
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);
@@ -55,7 +72,10 @@ export class GameService {
 
     async togglePlayer(gameId: number): Promise<Game> {
         const game = await this.findGame(gameId);
-
+        if (game.winner) {
+            console.log('GAME IS OVER!');
+            return game;
+        }
         game.currentPlayer = game.currentPlayer === PlayerType.PLAYER1 ? PlayerType.PLAYER2 : PlayerType.PLAYER1;
         await game.save();
         return game;
@@ -72,37 +92,57 @@ export class GameService {
         return game;
     }
 
-    async setWinner(gameId: number, winner: PlayerType): Promise<Game> {
-        const game = await this.gameModel.findByPk(gameId);
+    async setWinner(gameId: number, currentPlayer: PlayerType): Promise<Game> {
+        const game = await this.findGame(gameId);
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);
         }
 
-        game.winner = winner;
-        await game.save();
+        await this.updateGame(game.id, {
+            winner: currentPlayer,
+        });
 
-        return game;
+        return await this.findGame(game.id);
+    }
+
+    async setLooser(gameId: number, looserId: number): Promise<Game> {
+        const game = await this.findGame(gameId);
+        if (!game) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
+        }
+        const isPlayer1Loozer = game.player1Id == looserId;
+        await this.updateGame(game.id, {
+            winner: isPlayer1Loozer ? PlayerType.PLAYER2 : PlayerType.PLAYER1,
+        });
+
+        return await this.findGame(game.id);
     }
 
     async connectToGame(payload: ConnectToGamePayload): Promise<Game> {
         const { gameId, userId } = payload;
-        const game = await this.gameModel.findByPk(gameId);
-        const user = await this.usersService.getUserById(userId);
 
-        if (!game) {
-            throw new NotFoundException(`Game with ID ${gameId} not found`);
-        }
-        if (!user) {
+        const player2 = await this.usersService.updateUser(userId, { type: PlayerType.PLAYER2 });
+
+        if (!player2) {
             throw new NotFoundException(`User with ID ${userId} not found`);
         }
 
-        if (game.status !== GameStatus.WAITING_FOR_PLAYER) {
-            throw new ConflictException('The game is either already in progress or completed');
+        await this.gameModel.update(
+            { player2Id: player2.id, status: GameStatus.IN_PROGRESS },
+            { where: { id: gameId } },
+        );
+
+        const updatedGame = await this.gameModel.findByPk(gameId, {
+            include: [
+                { model: User, as: 'player1' },
+                { model: User, as: 'player2' },
+            ],
+        });
+
+        if (!updatedGame) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
         }
 
-        game.player2Id = user.id;
-        game.status = GameStatus.IN_PROGRESS;
-
-        return game.save();
+        return updatedGame;
     }
 }

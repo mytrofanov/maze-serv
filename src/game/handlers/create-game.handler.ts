@@ -1,28 +1,32 @@
 import { SocketErrorCodes, SocketEvents } from '../socket-types';
 import { GameService } from '../game.service';
-import { MazeCellService } from '../../cell/cell.service';
 import { Server } from 'socket.io';
 import { CreateGameDto } from '../dtos';
+import { MazeService } from '../../maze/maze.service';
+import { saveConnectionInfoOnGameCreate } from '../../utils';
 
 export const handleCreateGame =
-    (gameService: GameService, mazeCellService: MazeCellService, server: Server) =>
+    (gameService: GameService, mazeService: MazeService, server: Server) =>
     async (client: any, payload: CreateGameDto): Promise<any> => {
         const newGame = await gameService.createGame(payload);
-        const newMaze = await mazeCellService.createRandomMaze(newGame.id);
+        const newMaze = await mazeService.createRandomMaze(newGame.id);
+        const gameWithMaze = await gameService.updateGame(newGame.id, {
+            mazeId: newMaze.id,
+            maze: newMaze,
+        });
 
-        if (!newGame || !newMaze) {
+        if (!gameWithMaze || !newMaze) {
             client.emit(SocketEvents.ERROR, {
                 code: SocketErrorCodes.GAME_NOT_CREATED,
                 message: 'Error occurred while creating game',
             });
         } else {
-            client.emit(SocketEvents.GAME_CREATED, { game: newGame, maze: newMaze });
+            client.emit(SocketEvents.GAME_CREATED, { game: gameWithMaze, maze: newMaze });
         }
 
+        // SAVE FIRST PLAYER CONNECTION INFO
+        saveConnectionInfoOnGameCreate(client.id, newGame.id.toString());
+
         const availableGames = await gameService.getAvailableGames();
-        if (availableGames && availableGames.length) {
-            server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
-        } else {
-            server.emit(SocketEvents.AVAILABLE_GAMES, []);
-        }
+        server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
     };

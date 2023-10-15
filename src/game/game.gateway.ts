@@ -1,13 +1,19 @@
-import { OnGatewayConnection, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    SubscribeMessage,
+    WebSocketGateway,
+    WebSocketServer,
+} from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 import { GameLogService } from '../game-log/game-log.service';
-import { MazeCellService } from '../cell/cell.service';
 import { DirectionPayload, GameExitPayload, GiveUpPayload, MessagePayload, SocketEvents } from './socket-types';
 import * as process from 'process';
 import 'dotenv/config';
 import {
+    sendMessageToOpponent,
     handleConnectGame,
     handleConnection,
     handleCreateGame,
@@ -18,6 +24,7 @@ import {
     handleGiveUp,
 } from './handlers';
 import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
+import { MazeService } from '../maze/maze.service';
 
 @WebSocketGateway({
     cors: {
@@ -25,7 +32,7 @@ import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
         credentials: true,
     },
 }) // can choose port @WebSocketGateway(4001), for example
-export class GameGateway implements OnGatewayConnection {
+export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer()
     server: Server;
 
@@ -33,7 +40,7 @@ export class GameGateway implements OnGatewayConnection {
         private readonly gameService: GameService,
         private readonly usersService: UsersService,
         private readonly logService: GameLogService,
-        private readonly mazeCellService: MazeCellService,
+        private readonly mazeService: MazeService,
     ) {}
 
     //CONNECTION
@@ -41,27 +48,22 @@ export class GameGateway implements OnGatewayConnection {
         await handleConnection(this.gameService, this.usersService, this.server)(client, ...args);
     }
 
-    //CREATE_GAME
+    //CREATE_GAME AND SAVE CONNECTION INFO
     @SubscribeMessage(SocketEvents.CREATE_GAME)
     async handleCreateGame(client: any, payload: CreateGameDto): Promise<any> {
-        await handleCreateGame(this.gameService, this.mazeCellService, this.server)(client, payload);
+        await handleCreateGame(this.gameService, this.mazeService, this.server)(client, payload);
     }
 
-    //CONNECT_GAME
+    //CONNECT_GAME AND SAVE CONNECTION INFO
     @SubscribeMessage(SocketEvents.CONNECT_GAME)
     async handleConnectGame(client: any, payload: ConnectToGamePayloadDto): Promise<any> {
-        await handleConnectGame(this.gameService, this.mazeCellService, this.server)(client, payload);
+        await handleConnectGame(this.gameService, this.mazeService, this.server)(client, payload);
     }
 
     //HANDLE DIRECTION CHANGE
     @SubscribeMessage(SocketEvents.DIRECTION)
     async handleDirectionChange(client: any, payload: DirectionPayload): Promise<any> {
-        await handleDirectionChange(
-            this.gameService,
-            this.logService,
-            this.mazeCellService,
-            this.server,
-        )(client, payload);
+        await handleDirectionChange(this.gameService, this.logService, this.mazeService, this.server)(client, payload);
     }
 
     //SEND_MESSAGE
@@ -86,5 +88,10 @@ export class GameGateway implements OnGatewayConnection {
     @SubscribeMessage(SocketEvents.CREATE_USER)
     async handleCreateUser(client: any, payload: { userName: string }): Promise<any> {
         await handleCreateUser(this.usersService)(client, payload);
+    }
+
+    //DISCONNECT HANDLER
+    async handleDisconnect(client: any): Promise<any> {
+        await sendMessageToOpponent(this.server)(client);
     }
 }

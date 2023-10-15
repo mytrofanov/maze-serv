@@ -1,20 +1,15 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { GameGateway } from './game.gateway';
 import { GameService } from './game.service';
 import { GameLog } from '../game-log/game-log.model';
+import { GameLogModule } from '../game-log/game-log.module';
 import { Game } from './game.model';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { GameLogModule } from '../game-log/game-log.module';
-import { MazeCellModule } from '../cell/cell.module';
 import { UsersModule } from '../users/users.module';
+import { MazeModule } from '../maze/maze.module';
 
 @Module({
-    imports: [
-        SequelizeModule.forFeature([Game, GameLog]),
-        GameLogModule,
-        forwardRef(() => MazeCellModule),
-        UsersModule,
-    ],
+    imports: [SequelizeModule.forFeature([Game, GameLog]), MazeModule, GameLogModule, UsersModule],
     providers: [GameGateway, GameService],
     exports: [GameService],
 })
