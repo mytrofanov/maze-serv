@@ -7,3 +7,4 @@ export * from './give-up.handler';
 export * from './exit.handler';
 export * from './disconnect.handler';
 export * from './create-user.handler';
+export * from './reconnect-game.handler';

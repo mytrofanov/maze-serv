@@ -2,9 +2,17 @@ import { SocketErrorCodes, SocketEvents, SocketSuccessCodes } from '../socket-ty
 import { GameService } from '../game.service';
 import { UsersService } from '../../users/users.service';
 import { Server } from 'socket.io';
+import { MazeService } from '../../maze/maze.service';
+import { GameLogService } from '../../game-log/game-log.service';
 
 export const handleConnection =
-    (gameService: GameService, usersService: UsersService, server: Server) =>
+    (
+        gameService: GameService,
+        usersService: UsersService,
+        mazeService: MazeService,
+        logService: GameLogService,
+        server: Server,
+    ) =>
     async (client: any, ...args: any[]) => {
         console.log('Client connected:', client.handshake.query);
         const connectionPayload = client.handshake.query;
@@ -38,5 +46,15 @@ export const handleConnection =
             server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
         } else {
             server.emit(SocketEvents.AVAILABLE_GAMES, []);
+        }
+
+        //CHECK IF RECONNECT
+        const lastGameInProgress = await gameService.findGameInProgress(user.id);
+        if (lastGameInProgress) {
+            const maze = await mazeService.getMazeById(lastGameInProgress.id);
+            const allLogs = await logService.getGameLogs(lastGameInProgress.id);
+
+            server.emit(SocketEvents.LOG_UPDATED, allLogs);
+            server.emit(SocketEvents.GAME_UPDATED, { game: lastGameInProgress, maze: maze });
         }
     };

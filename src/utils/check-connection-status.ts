@@ -20,8 +20,9 @@ export const getClientWithDisconnectedOpponent = (disconnectedSocketId: SocketId
     if (gameId) {
         const players = gameToConnectionMap.get(gameId);
 
+        if (!players) return null;
         const opponentSocketId =
-            players.player1SocketId === disconnectedSocketId ? players.player2SocketId : players.player1SocketId;
+            players.player1SocketId == disconnectedSocketId ? players.player2SocketId : players.player1SocketId;
 
         //CLEAR CONNECTION INFO
         connectionToGameMap.delete(disconnectedSocketId);

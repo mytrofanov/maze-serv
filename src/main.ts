@@ -4,7 +4,7 @@ import * as process from 'process';
 import { ExpressAdapter, NestExpressApplication } from '@nestjs/platform-express';
 import * as express from 'express';
 import * as cors from 'cors';
-import { Sequelize } from 'sequelize-typescript';
+//import { Sequelize } from 'sequelize-typescript';
 import 'dotenv/config';
 
 async function bootstrap() {
@@ -18,8 +18,8 @@ async function bootstrap() {
     );
 
     //FOR DB STRUCTURE CHANGE (ALL DATA WILL BE DELETED!):
-    const sequelize = app.get(Sequelize);
-    await sequelize.sync({ force: true });
+    // const sequelize = app.get(Sequelize);
+    // await sequelize.sync({ force: true });
 
     await app.listen(PORT, '0.0.0.0', () => {
         console.log('Server started on port:', PORT);

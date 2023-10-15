@@ -5,6 +5,7 @@ import { ConnectToGamePayload } from './socket-types';
 import { UsersService } from '../users/users.service';
 import { PlayerType, User } from '../users/users.model';
 import { CreateGameDto } from './dtos';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class GameService {
@@ -47,6 +48,33 @@ export class GameService {
             ],
             order: [['id', 'DESC']],
         });
+    }
+
+    async findGameInProgress(userId: number): Promise<Game> {
+        const games = await this.gameModel.findAll({
+            where: {
+                [Op.or]: [{ player1Id: userId }, { player2Id: userId }],
+                status: GameStatus.IN_PROGRESS,
+            },
+            order: [['id', 'DESC']],
+            limit: 1,
+            include: [
+                {
+                    model: User,
+                    as: 'player1',
+                },
+                {
+                    model: User,
+                    as: 'player2',
+                },
+            ],
+        });
+
+        if (games.length === 0) {
+            throw new NotFoundException(`Game not found for user ID ${userId}`);
+        }
+
+        return games[0];
     }
 
     async findGame(gameId: number): Promise<Game> {

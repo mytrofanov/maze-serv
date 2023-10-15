@@ -40,7 +40,7 @@ export const handleDirectionChange =
                 message: 'Player is not found on the maze',
             });
         }
-        console.log('startPosition: ', startPosition);
+
         //FIND NEXT POSITION
         const updatedPosition = newPosition(direction, { x: startPosition.x.colX, y: startPosition.y.rowY });
 
