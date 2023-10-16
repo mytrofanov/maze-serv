@@ -99,7 +99,8 @@ export class GameService {
         });
 
         if (games.length === 0) {
-            throw new NotFoundException(`Games  not found for user ID ${userId}`);
+            console.log(`Games not found for user ID ${userId}`);
+            return;
         }
 
         return games;

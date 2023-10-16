@@ -42,11 +42,10 @@ export const handleConnection =
         }
 
         const availableGames = await gameService.getAvailableGames();
-        if (availableGames && availableGames.length) {
-            server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
-        } else {
-            server.emit(SocketEvents.AVAILABLE_GAMES, []);
-        }
+        server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
+
+        const completedGames = await gameService.findCompletedGames(user.id);
+        server.emit(SocketEvents.COMPLETED_GAMES, completedGames);
 
         //CHECK IF RECONNECT
         const lastGameInProgress = await gameService.findGameInProgress(user.id);

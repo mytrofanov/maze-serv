@@ -10,4 +10,10 @@ export const handleExit =
         const game = await gameService.exitGame(gameId, playerId);
 
         client.emit(SocketEvents.GAME_UPDATED, { game });
+
+        const availableGames = await gameService.getAvailableGames();
+        server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
+
+        const completedGames = await gameService.findCompletedGames(playerId);
+        server.emit(SocketEvents.COMPLETED_GAMES, completedGames);
     };
