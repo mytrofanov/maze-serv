@@ -25,7 +25,7 @@ export class GameLog extends Model {
     message: string;
 
     @Column({ type: DataType.JSONB, allowNull: true })
-    mazeState: any;
+    mazeSnapShot: any;
 
     @Column({ type: DataType.INTEGER })
     rowY: number;

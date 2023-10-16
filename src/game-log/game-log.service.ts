@@ -36,7 +36,7 @@ export class GameLogService {
             colX: newX ? newX : null,
             message: logMessage,
             gameId,
-            mazeState: gameStateSnapShot ? gameStateSnapShot : null,
+            mazeSnapShot: gameStateSnapShot ? gameStateSnapShot : null,
         };
 
         return this.gameLogModel.create(log);

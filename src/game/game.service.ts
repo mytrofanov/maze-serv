@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service';
 import { PlayerType, User } from '../users/users.model';
 import { CreateGameDto } from './dtos';
 import { Op } from 'sequelize';
+import { GameLog } from '../game-log/game-log.model';
 
 @Injectable()
 export class GameService {
@@ -123,6 +124,32 @@ export class GameService {
         if (!game) {
             throw new NotFoundException(`Game with ID ${gameId} not found`);
         }
+
+        return game;
+    }
+
+    async findGameForReplay(gameId: number): Promise<Game> {
+        const game = await this.gameModel.findByPk(gameId, {
+            include: [
+                {
+                    model: User,
+                    as: 'player1',
+                },
+                {
+                    model: User,
+                    as: 'player2',
+                },
+                {
+                    model: GameLog,
+                    as: 'logs',
+                },
+            ],
+        });
+
+        if (!game) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
+        }
+        game.status = GameStatus.REPLAY_MODE;
 
         return game;
     }
