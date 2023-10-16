@@ -78,7 +78,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //REPLAY_GAME
     @SubscribeMessage(SocketEvents.REPLAY_GAME)
     async handleReplayGame(client: any, payload: ConnectToGamePayloadDto): Promise<any> {
-        await handleReplayGame(this.gameService, this.mazeService, this.server)(client, payload);
+        await handleReplayGame(this.gameService, this.logService, this.server)(client, payload);
     }
 
     //HANDLE DIRECTION CHANGE
