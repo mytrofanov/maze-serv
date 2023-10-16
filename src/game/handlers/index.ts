@@ -9,3 +9,4 @@ export * from './disconnect.handler';
 export * from './create-user.handler';
 export * from './reconnect-game.handler';
 export * from './replay-game.handler';
+export * from './availiable-games.handler';

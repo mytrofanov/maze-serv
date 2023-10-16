@@ -1,25 +1,22 @@
 import { SocketErrorCodes, SocketEvents } from '../socket-types';
 import { GameService } from '../game.service';
 import { Server } from 'socket.io';
-import { ConnectToGamePayloadDto } from '../dtos';
+import { ReplayGamePayDto } from '../dtos';
 import { MazeService } from '../../maze/maze.service';
-import { saveConnectionInfoOnGameConnect } from '../../utils';
+import { GameStatus } from '../game.model';
 
 export const handleReplayGame =
     (gameService: GameService, mazeService: MazeService, server: Server) =>
-    async (client: any, payload: ConnectToGamePayloadDto): Promise<any> => {
-        const connectedGame = await gameService.connectToGame(payload);
-        const maze = await mazeService.getMazeById(connectedGame.id);
+    async (client: any, payload: ReplayGamePayDto): Promise<any> => {
+        const { gameId } = payload;
+        const gameToReplay = await gameService.findGame(gameId);
 
-        if (!connectedGame || !maze) {
+        if (!gameToReplay || gameToReplay.status !== GameStatus.COMPLETED) {
             client.emit(SocketEvents.ERROR, {
-                code: SocketErrorCodes.NETWORK_ERROR,
-                message: 'Error occurred while connecting to game',
+                code: SocketErrorCodes.GAME_NOT_FOUND,
+                message: `Error occurred while replaying game with id ${gameId}`,
             });
         } else {
-            // SAVE SECOND PLAYER CONNECTION INFO
-            saveConnectionInfoOnGameConnect(client.id, connectedGame.id.toString());
-
-            server.emit(SocketEvents.GAME_UPDATED, { game: connectedGame, maze: maze });
+            server.emit(SocketEvents.GAME_TO_REPLAY, { game: gameToReplay });
         }
     };

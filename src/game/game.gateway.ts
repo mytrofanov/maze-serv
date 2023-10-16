@@ -24,6 +24,7 @@ import {
     handleGiveUp,
     handleReconnect,
     handleReplayGame,
+    handleSendAvailableGames,
 } from './handlers';
 import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
 import { MazeService } from '../maze/maze.service';
@@ -60,6 +61,12 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @SubscribeMessage(SocketEvents.CREATE_GAME)
     async handleCreateGame(client: any, payload: CreateGameDto): Promise<any> {
         await handleCreateGame(this.gameService, this.mazeService, this.server)(client, payload);
+    }
+
+    //SEND AVAILABLE GAMES
+    @SubscribeMessage(SocketEvents.GET_AVAILABLE_GAMES)
+    async handleSendAvailableGames(client: any, payload: { userId: string }): Promise<any> {
+        await handleSendAvailableGames(this.gameService, this.server)(client, payload);
     }
 
     //CONNECT_GAME AND SAVE CONNECTION INFO

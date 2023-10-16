@@ -4,3 +4,4 @@ export * from './create-log.dto';
 export * from './direction-change.dto';
 export * from './game-exit.dto';
 export * from './give-up.dto';
+export * from './replay-game.dto';
