@@ -10,6 +10,7 @@ export enum GameStatus {
     CONNECTION_ERROR = 'CONNECTION_ERROR',
     CONNECTING = 'CONNECTING',
     CONNECTED = 'CONNECTED',
+    REPLAY_MODE = 'REPLAY_MODE',
     WELCOME_SCREEN = 'WELCOME_SCREEN',
 }
 
@@ -56,6 +57,9 @@ export class Game extends Model {
 
     @BelongsTo(() => Maze)
     maze: Maze;
+
+    @Column({ type: DataType.JSONB, allowNull: true })
+    initialMaze: any;
 
     @HasMany(() => GameLog)
     logs: GameLog[];

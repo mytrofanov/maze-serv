@@ -42,19 +42,20 @@ export const handleConnection =
         }
 
         const availableGames = await gameService.getAvailableGames();
-        if (availableGames && availableGames.length) {
-            server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
-        } else {
-            server.emit(SocketEvents.AVAILABLE_GAMES, []);
-        }
+        server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
 
-        //CHECK IF RECONNECT
-        const lastGameInProgress = await gameService.findGameInProgress(user.id);
-        if (lastGameInProgress) {
-            const maze = await mazeService.getMazeById(lastGameInProgress.id);
-            const allLogs = await logService.getGameLogs(lastGameInProgress.id);
+        if (user) {
+            const completedGames = await gameService.findCompletedGames(user.id);
+            server.emit(SocketEvents.COMPLETED_GAMES, completedGames);
 
-            server.emit(SocketEvents.LOG_UPDATED, allLogs);
-            server.emit(SocketEvents.GAME_UPDATED, { game: lastGameInProgress, maze: maze });
+            //CHECK IF RECONNECT
+            const lastGameInProgress = await gameService.findGameInProgress(user.id);
+            if (lastGameInProgress) {
+                const maze = await mazeService.getMazeById(lastGameInProgress.id);
+                const allLogs = await logService.getGameLogs(lastGameInProgress.id);
+
+                server.emit(SocketEvents.LOG_UPDATED, allLogs);
+                server.emit(SocketEvents.GAME_UPDATED, { game: lastGameInProgress, maze: maze });
+            }
         }
     };

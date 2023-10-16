@@ -22,6 +22,7 @@ export class GameLogService {
         newX?: number,
         newY?: number,
         message?: string,
+        gameStateSnapShot?: string,
     ): Promise<GameLog> {
         const user = await this.usersService.getUserById(playerId);
         const logMessage = checkForNullUndefined(message)
@@ -35,6 +36,7 @@ export class GameLogService {
             colX: newX ? newX : null,
             message: logMessage,
             gameId,
+            mazeSnapShot: gameStateSnapShot ? gameStateSnapShot : null,
         };
 
         return this.gameLogModel.create(log);

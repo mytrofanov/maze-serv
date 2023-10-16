@@ -23,6 +23,8 @@ import {
     handleExit,
     handleGiveUp,
     handleReconnect,
+    handleReplayGame,
+    handleSendAvailableGames,
 } from './handlers';
 import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
 import { MazeService } from '../maze/maze.service';
@@ -61,10 +63,22 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
         await handleCreateGame(this.gameService, this.mazeService, this.server)(client, payload);
     }
 
+    //SEND AVAILABLE GAMES
+    @SubscribeMessage(SocketEvents.GET_AVAILABLE_GAMES)
+    async handleSendAvailableGames(client: any, payload: { userId: string }): Promise<any> {
+        await handleSendAvailableGames(this.gameService, this.server)(client, payload);
+    }
+
     //CONNECT_GAME AND SAVE CONNECTION INFO
     @SubscribeMessage(SocketEvents.CONNECT_GAME)
     async handleConnectGame(client: any, payload: ConnectToGamePayloadDto): Promise<any> {
         await handleConnectGame(this.gameService, this.mazeService, this.server)(client, payload);
+    }
+
+    //REPLAY_GAME
+    @SubscribeMessage(SocketEvents.REPLAY_GAME)
+    async handleReplayGame(client: any, payload: ConnectToGamePayloadDto): Promise<any> {
+        await handleReplayGame(this.gameService)(client, payload);
     }
 
     //HANDLE DIRECTION CHANGE

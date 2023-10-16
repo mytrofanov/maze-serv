@@ -6,6 +6,7 @@ import { UsersService } from '../users/users.service';
 import { PlayerType, User } from '../users/users.model';
 import { CreateGameDto } from './dtos';
 import { Op } from 'sequelize';
+import { GameLog } from '../game-log/game-log.model';
 
 @Injectable()
 export class GameService {
@@ -71,10 +72,39 @@ export class GameService {
         });
 
         if (games.length === 0) {
-            throw new NotFoundException(`Game not found for user ID ${userId}`);
+            console.log(`Game not found for user ID ${userId}`);
+            return;
+            // throw new NotFoundException(`Game not found for user ID ${userId}`);
         }
 
         return games[0];
+    }
+
+    async findCompletedGames(userId: number): Promise<Game[]> {
+        const games = await this.gameModel.findAll({
+            where: {
+                [Op.or]: [{ player1Id: userId }, { player2Id: userId }],
+                status: GameStatus.COMPLETED,
+            },
+            order: [['id', 'DESC']],
+            include: [
+                {
+                    model: User,
+                    as: 'player1',
+                },
+                {
+                    model: User,
+                    as: 'player2',
+                },
+            ],
+        });
+
+        if (games.length === 0) {
+            console.log(`Games not found for user ID ${userId}`);
+            return;
+        }
+
+        return games;
     }
 
     async findGame(gameId: number): Promise<Game> {
@@ -98,6 +128,32 @@ export class GameService {
         return game;
     }
 
+    async findGameForReplay(gameId: number): Promise<Game> {
+        const game = await this.gameModel.findByPk(gameId, {
+            include: [
+                {
+                    model: User,
+                    as: 'player1',
+                },
+                {
+                    model: User,
+                    as: 'player2',
+                },
+                {
+                    model: GameLog,
+                    as: 'logs',
+                },
+            ],
+        });
+
+        if (!game) {
+            throw new NotFoundException(`Game with ID ${gameId} not found`);
+        }
+        game.status = GameStatus.REPLAY_MODE;
+
+        return game;
+    }
+
     async togglePlayer(gameId: number): Promise<Game> {
         const game = await this.findGame(gameId);
         if (game.winner) {
@@ -117,7 +173,7 @@ export class GameService {
         }
         game.status = GameStatus.COMPLETED;
         await game.save();
-        return game;
+        return undefined;
     }
 
     async setWinner(gameId: number, currentPlayer: PlayerType): Promise<Game> {

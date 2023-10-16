@@ -8,7 +8,7 @@ export const handleCreateLog =
     async (client: any, payload: LogDto): Promise<any> => {
         const { gameId, playerId, playerType, message } = payload;
 
-        await logService.createLog(gameId, playerType, playerId, undefined, undefined, undefined, message);
+        await logService.createLog(gameId, playerType, playerId, undefined, undefined, undefined, message, undefined);
 
         const allLogs = await logService.getGameLogs(gameId);
 

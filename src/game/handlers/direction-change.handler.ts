@@ -44,17 +44,6 @@ export const handleDirectionChange =
         //FIND NEXT POSITION
         const updatedPosition = newPosition(direction, { x: startPosition.x.colX, y: startPosition.y.rowY });
 
-        //CREATE LOG
-        await logService.createLog(
-            gameId,
-            playerType,
-            playerId,
-            direction,
-            updatedPosition.x,
-            updatedPosition.y,
-            message,
-        );
-
         await mazeService.handleDirectionChange(
             game,
             direction,
@@ -66,6 +55,18 @@ export const handleDirectionChange =
 
         const updatedGameState = await gameService.togglePlayer(gameId);
         const updatedMaze = await mazeService.getMazeById(gameId);
+        const gameStateSnapShot = JSON.stringify(updatedMaze.rows); //FOR REPLAY
+        //CREATE LOG
+        await logService.createLog(
+            gameId,
+            playerType,
+            playerId,
+            direction,
+            updatedPosition.x,
+            updatedPosition.y,
+            message,
+            gameStateSnapShot,
+        );
 
         const allLogs = await logService.getGameLogs(gameId);
         server.emit(SocketEvents.LOG_UPDATED, allLogs);

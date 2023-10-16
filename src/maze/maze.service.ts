@@ -83,8 +83,13 @@ export class MazeService {
             }
         }
 
-        // Return the created Maze with all associated Rows and MazeCells.
-        return this.getMazeById(createdMaze.id);
+        const newMaze = await this.getMazeById(createdMaze.id);
+
+        //CREATE INITIAL MAZE FOR RE-PLAY
+        const initialMazeJson = JSON.stringify(newMaze);
+        await this.gameService.updateGame(gameId, { initialMaze: initialMazeJson });
+
+        return newMaze;
     }
 
     async findPlayerPosition(game: Game, player: PlayerType): Promise<{ y: Row; x: MazeCell } | null> {
@@ -126,38 +131,35 @@ export class MazeService {
             if (newCell.type === Cell.EXIT) {
                 await this.gameService.setWinner(game.id, currentPlayer);
             }
-            //move player to new row
-            await this.rowService.updateRow(newRow.id, {
-                player1onRow: isPlayer1,
-            });
-            if (isPlayer1) {
-                await this.rowService.updateRow(newRow.id, {
-                    player1onRow: isPlayer1,
-                });
-            }
-            if (isPlayer2) {
-                await this.rowService.updateRow(newRow.id, {
-                    player2onRow: isPlayer2,
-                });
-            }
-
             //move player to new cell
-            await this.cellService.updateCell(newCell.id, { revealed: true, player: currentPlayer });
+            if (!newCell.player) {
+                await this.cellService.updateCell(newCell.id, { revealed: true, player: currentPlayer });
 
-            //clear prev row
-            if (isPlayer1 && newRow.id !== prevRow.id) {
-                await this.rowService.updateRow(prevRow.id, {
-                    player1onRow: !isPlayer1,
-                });
-            }
-            if (isPlayer2 && newRow.id !== prevRow.id) {
-                await this.rowService.updateRow(prevRow.id, {
-                    player2onRow: !isPlayer2,
-                });
-            }
+                if (isPlayer1) {
+                    await this.rowService.updateRow(newRow.id, {
+                        player1onRow: isPlayer1,
+                    });
+                }
+                if (isPlayer2) {
+                    await this.rowService.updateRow(newRow.id, {
+                        player2onRow: isPlayer2,
+                    });
+                }
 
-            //clear prev cell
-            await this.cellService.updateCell(prevCell.id, { revealed: true, player: null, direction: direction });
+                //clear prev row
+                if (isPlayer1 && newRow.rowY !== prevRow.rowY) {
+                    await this.rowService.updateRow(prevRow.id, {
+                        player1onRow: false,
+                    });
+                }
+                if (isPlayer2 && newRow.rowY !== prevRow.rowY) {
+                    await this.rowService.updateRow(prevRow.id, {
+                        player2onRow: false,
+                    });
+                }
+                //clear prev cell
+                await this.cellService.updateCell(prevCell.id, { revealed: true, player: null, direction: direction });
+            }
         }
         //if wall
         // newCell.revealed = true;
