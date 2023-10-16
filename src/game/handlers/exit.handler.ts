@@ -7,9 +7,9 @@ export const handleExit =
     (gameService: GameService, server: Server) =>
     async (client: any, payload: GameExitDto): Promise<any> => {
         const { gameId, playerId } = payload;
-        const game = await gameService.exitGame(gameId, playerId);
+        await gameService.exitGame(gameId, playerId);
 
-        client.emit(SocketEvents.GAME_UPDATED, { game });
+        client.emit(SocketEvents.GAME_UPDATED);
 
         const availableGames = await gameService.getAvailableGames();
         server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);

@@ -173,7 +173,7 @@ export class GameService {
         }
         game.status = GameStatus.COMPLETED;
         await game.save();
-        return game;
+        return undefined;
     }
 
     async setWinner(gameId: number, currentPlayer: PlayerType): Promise<Game> {
