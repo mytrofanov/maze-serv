@@ -2,7 +2,11 @@
   "name": "maze-server",
   "version": "0.0.1",
   "description": "Maze Game",
-  "author": "Max Mytrofanov",
+  "author": {
+    "name": "Max Mytrofanov",
+    "email": "mytrofanovmaxym@gmail.com",
+    "url": "http://max.kyiv.ua"
+  },
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
@@ -11,6 +15,9 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main"
+  },
+  "engines": {
+    "node": "20.8.0"
   },
   "dependencies": {
     "@nestjs/common": "^10.2.7",
