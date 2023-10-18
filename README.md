@@ -17,11 +17,9 @@ POSTGRES_PASSWORD=root   - or your password for PG (root is default)
 
 POSTGRES_PORT=5432       - or your port (5432 is default) 
 
-MY_NETWORK=http://000.000.0.0  - change 000.000.0.0 to your IP adress (where server is)   
-MY_NETWORK=http://192.168.1.8:5000
-CORS_URL=http://localhost:5173      -for local front-end or other url for remote front-end
+CORS_URL=http://localhost:5173
 
-WEB_SOCKET_PORT: 5000      
+WEB_SOCKET_PORT=5000      
 
 
 3. use command:
