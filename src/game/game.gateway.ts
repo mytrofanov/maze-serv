@@ -29,7 +29,6 @@ import {
 import { ConnectToGamePayloadDto, CreateGameDto } from './dtos';
 import { MazeService } from '../maze/maze.service';
 
-console.log('Number(process.env.WEB_SOCKET_PORT): ', Number(process.env.WEB_SOCKET_PORT));
 @WebSocketGateway({
     cors: {
         origin: process.env.CORS_URL,
