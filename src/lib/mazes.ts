@@ -111,3 +111,76 @@ const newMazeD: MazeMatrixCell[][] = [
 ];
 
 export const Mazes = [newMaze, newMazeA, newMazeB, newMazeC, newMazeD];
+
+export const singlePlayerMaze: MazeMatrixCell[][] = [
+    [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
+    [wall, startFirst, path, path, wall, path, path, path, path, wall],
+    [wall, wall, wall, path, wall, wall, path, wall, wall, wall],
+    [wall, wall, path, path, wall, wall, path, wall, wall, wall],
+    [wall, wall, wall, path, path, path, path, wall, wall, wall],
+    [wall, wall, wall, path, wall, wall, path, wall, wall, wall],
+    [wall, path, path, path, wall, wall, wall, wall, wall, wall],
+    [wall, wall, wall, path, wall, wall, wall, wall, wall, wall],
+    [exit, path, path, path, path, path, path, path, path, wall],
+    [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
+];
+
+const singlePlayerMazeA: MazeMatrixCell[][] = [
+    [wall, wall, wall, exit, wall, wall, wall, wall, wall, wall],
+    [wall, path, path, path, path, path, path, path, path, wall],
+    [wall, wall, wall, path, wall, wall, path, wall, wall, wall],
+    [wall, wall, path, path, wall, path, path, path, path, wall],
+    [wall, wall, wall, path, path, path, path, wall, path, wall],
+    [wall, wall, wall, path, wall, wall, path, wall, path, wall],
+    [wall, path, path, path, wall, wall, wall, wall, path, wall],
+    [wall, wall, wall, path, wall, wall, wall, wall, path, wall],
+    [wall, startFirst, path, path, path, path, path, path, path, wall],
+    [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
+];
+
+const singlePlayerMazeB: MazeMatrixCell[][] = [
+    [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
+    [wall, path, path, startFirst, path, path, path, path, path, wall],
+    [wall, wall, wall, path, wall, wall, path, wall, wall, wall],
+    [wall, wall, path, path, wall, path, path, path, path, wall],
+    [wall, wall, wall, path, path, path, path, wall, path, wall],
+    [wall, wall, wall, path, wall, wall, path, wall, path, exit],
+    [wall, path, path, path, wall, path, path, path, path, wall],
+    [wall, wall, wall, path, wall, path, wall, wall, wall, wall],
+    [wall, path, path, path, path, path, path, path, path, wall],
+    [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
+];
+
+const singlePlayerMazeC: MazeMatrixCell[][] = [
+    [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
+    [wall, path, path, startFirst, path, path, path, path, path, wall],
+    [wall, wall, wall, path, wall, wall, path, wall, wall, wall],
+    [wall, path, path, path, wall, path, path, path, path, wall],
+    [wall, wall, wall, path, path, path, path, wall, path, wall],
+    [wall, wall, wall, path, wall, wall, wall, wall, path, wall],
+    [wall, path, path, path, wall, path, path, path, path, wall],
+    [wall, wall, wall, path, wall, path, wall, wall, wall, wall],
+    [wall, path, path, path, path, path, path, path, path, wall],
+    [wall, wall, wall, wall, wall, wall, exit, wall, wall, wall],
+];
+
+const singlePlayerMazeD: MazeMatrixCell[][] = [
+    [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
+    [wall, path, path, path, path, path, path, path, path, wall],
+    [wall, wall, wall, path, wall, wall, path, wall, wall, wall],
+    [exit, path, path, path, wall, path, path, path, path, wall],
+    [wall, wall, wall, path, path, path, path, wall, path, wall],
+    [wall, wall, wall, path, wall, wall, wall, wall, path, wall],
+    [wall, path, path, path, wall, path, path, path, path, wall],
+    [wall, path, wall, wall, wall, path, wall, wall, wall, wall],
+    [wall, path, path, startFirst, path, path, path, path, path, wall],
+    [wall, wall, wall, wall, wall, wall, wall, wall, wall, wall],
+];
+
+export const SinglePlayerMazes = [
+    singlePlayerMaze,
+    singlePlayerMazeA,
+    singlePlayerMazeB,
+    singlePlayerMazeC,
+    singlePlayerMazeD,
+];

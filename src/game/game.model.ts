@@ -5,6 +5,7 @@ import { Maze } from '../maze/maze.model';
 
 export enum GameStatus {
     WAITING_FOR_PLAYER = 'WAITING_FOR_PLAYER',
+    SINGLE_PLAYER_GAME = 'SINGLE_PLAYER_GAME',
     IN_PROGRESS = 'IN_PROGRESS',
     COMPLETED = 'COMPLETED',
     CONNECTION_ERROR = 'CONNECTION_ERROR',
@@ -60,6 +61,9 @@ export class Game extends Model {
 
     @Column({ type: DataType.JSONB, allowNull: true })
     initialMaze: any;
+
+    @Column({ type: DataType.BOOLEAN, defaultValue: false })
+    singlePlayerGame: boolean;
 
     @HasMany(() => GameLog)
     logs: GameLog[];

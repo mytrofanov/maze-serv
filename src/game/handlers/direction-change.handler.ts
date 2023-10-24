@@ -22,11 +22,11 @@ export const handleDirectionChange =
         }
 
         //CHECK WHO CAN MAKE MOVE
-        if (game.currentPlayer === PlayerType.PLAYER1 && playerId !== game.player1Id) {
+        if (!game.singlePlayerGame && game.currentPlayer === PlayerType.PLAYER1 && playerId !== game.player1Id) {
             console.log('Player2 cant make move, Player1 should make move');
             return;
         }
-        if (game.currentPlayer === PlayerType.PLAYER2 && playerId !== game.player2Id) {
+        if (!game.singlePlayerGame && game.currentPlayer === PlayerType.PLAYER2 && playerId !== game.player2Id) {
             console.log('Player1 cant make move, Player2 should make move');
             return;
         }

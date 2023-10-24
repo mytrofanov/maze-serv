@@ -9,7 +9,7 @@ export const handleCreateGame =
     (gameService: GameService, mazeService: MazeService, server: Server) =>
     async (client: any, payload: CreateGameDto): Promise<any> => {
         const newGame = await gameService.createGame(payload);
-        const newMaze = await mazeService.createRandomMaze(newGame.id);
+        const newMaze = await mazeService.createRandomMaze(newGame.id, payload.singlePlayerGame);
         const gameWithMaze = await gameService.updateGame(newGame.id, {
             mazeId: newMaze.id,
             maze: newMaze,

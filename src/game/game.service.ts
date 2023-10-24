@@ -17,13 +17,14 @@ export class GameService {
     ) {}
 
     async createGame(payload: CreateGameDto): Promise<Game> {
-        const { player1Id } = payload;
+        const { player1Id, singlePlayerGame } = payload;
         const player1 = await this.usersService.updateUser(player1Id, { type: PlayerType.PLAYER1 });
         return await this.gameModel.create({
             player1Id: player1.id,
             player1: player1,
-            status: GameStatus.WAITING_FOR_PLAYER,
+            status: singlePlayerGame ? GameStatus.IN_PROGRESS : GameStatus.WAITING_FOR_PLAYER,
             winner: null,
+            singlePlayerGame,
         });
     }
 
