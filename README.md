@@ -2,10 +2,12 @@
 ## Multiplayer game on React, Node, Nest-Js, Postgress, WebSockets
 
 To start server locally:
-1. Create new DB on pgAdmin (for example named "mazes")
-2. Add .env file in root of the project, with next vars:
+1. You can choose:
+    - if using pgAdmin, then create new DB on pgAdmin (for example named "mazes"), edit file "app.module.ts" (uncomment PG-ADMIN options)
+    - or use simple sqlite (by default), then no need to install pgAdmin
+2. Add .env file in root of the project, with next vars (POSTGRES vars are optional):
 
-PORT=5000
+PORT=5000  
 
 POSTGRES_HOST=localhost
 
