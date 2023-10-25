@@ -8,6 +8,9 @@ export const handleGiveUp =
     async (client: any, payload: GiveUpDto): Promise<any> => {
         const { gameId, playerId } = payload;
         const updatedGame = await gameService.setLooser(gameId, playerId);
-
-        server.emit(SocketEvents.GAME_UPDATED, { game: updatedGame });
+        if (updatedGame.singlePlayerGame) {
+            client.emit(SocketEvents.GAME_UPDATED, { game: updatedGame });
+        } else {
+            server.emit(SocketEvents.GAME_UPDATED, { game: updatedGame });
+        }
     };

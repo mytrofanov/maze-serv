@@ -69,6 +69,11 @@ export const handleDirectionChange =
         );
 
         const allLogs = await logService.getGameLogs(gameId);
-        server.emit(SocketEvents.LOG_UPDATED, allLogs);
-        server.emit(SocketEvents.GAME_UPDATED, { game: updatedGameState, maze: updatedMaze });
+        if (game.singlePlayerGame) {
+            client.emit(SocketEvents.LOG_UPDATED, allLogs);
+            client.emit(SocketEvents.GAME_UPDATED, { game: updatedGameState, maze: updatedMaze });
+        } else {
+            server.emit(SocketEvents.LOG_UPDATED, allLogs);
+            server.emit(SocketEvents.GAME_UPDATED, { game: updatedGameState, maze: updatedMaze });
+        }
     };
