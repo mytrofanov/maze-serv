@@ -27,6 +27,8 @@ export const handleCreateGame =
         // SAVE FIRST PLAYER CONNECTION INFO
         saveConnectionInfoOnGameCreate(client.id, newGame.id.toString());
 
-        const availableGames = await gameService.getAvailableGames();
-        server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
+        if (!payload.singlePlayerGame) {
+            const availableGames = await gameService.getAvailableGames();
+            server.emit(SocketEvents.AVAILABLE_GAMES, availableGames);
+        }
     };
