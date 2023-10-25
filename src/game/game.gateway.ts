@@ -90,7 +90,7 @@ export class GameGateway implements OnGatewayConnection, OnGatewayDisconnect {
     //SEND_MESSAGE
     @SubscribeMessage(SocketEvents.SEND_MESSAGE)
     async handleCreateLog(client: any, payload: MessagePayload): Promise<any> {
-        await handleCreateLog(this.logService, this.server)(client, payload);
+        await handleCreateLog(this.logService, this.gameService, this.server)(client, payload);
     }
 
     //GIVE UP
